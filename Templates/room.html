@@ -5,10 +5,11 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ room["room_name"] }} | Watch//Party</title>
+    <title>
+        {{ room["room_name"] }} | Watch//Party
+    </title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
@@ -16,157 +17,332 @@
     <style>
 
         .room-container {
-
             width: 94%;
-
             max-width: 1400px;
-
             margin: 25px auto;
-
         }
 
         .room-header {
-
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
-
             margin-bottom: 20px;
-
+            gap: 20px;
         }
 
         .room-title h1 {
-
             font-size: 28px;
-
             letter-spacing: -1px;
-
+            margin-bottom: 8px;
         }
 
         .room-code-display {
-
             color: var(--cyan);
-
             font-size: 13px;
-
             letter-spacing: 2px;
-
         }
 
         .room-layout {
-
             display: grid;
-
             grid-template-columns: 1fr 320px;
-
             gap: 20px;
-
         }
 
+        /* =========================================
+           VIDEO
+        ========================================= */
+
         .video-section {
-
             aspect-ratio: 16 / 9;
-
             background: #000;
-
             border: 1px solid var(--border);
-
             border-radius: 15px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
             position: relative;
-
             overflow: hidden;
+        }
 
+        .video-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #000;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        #youtubePlayer {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        #youtubePlayer iframe {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .video-placeholder {
-
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-
             color: var(--muted);
-
         }
 
         .video-placeholder span {
-
             display: block;
-
             font-size: 70px;
-
             margin-bottom: 15px;
-
         }
 
+        .video-info {
+            position: absolute;
+            left: 15px;
+            bottom: 15px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            font-size: 12px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* =========================================
+           SIDEBAR
+        ========================================= */
+
         .sidebar {
-
             border: 1px solid var(--border);
-
             border-radius: 15px;
-
             background: var(--surface);
-
             overflow: hidden;
-
         }
 
         .sidebar-title {
-
             padding: 18px;
-
             border-bottom: 1px solid var(--border);
-
             font-weight: bold;
-
         }
 
         .players {
-
             padding: 10px;
-
         }
 
         .player {
-
             padding: 12px;
-
             margin-bottom: 5px;
-
             border-radius: 8px;
-
             background: rgba(255, 255, 255, 0.03);
-
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .online {
-
             display: inline-block;
-
             width: 7px;
-
             height: 7px;
-
             border-radius: 50%;
-
             background: #22c55e;
-
             margin-right: 8px;
-
+            flex-shrink: 0;
         }
+
+        .host-badge {
+            margin-left: auto;
+            font-size: 10px;
+            color: var(--cyan);
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           HOST CONTROLS
+        ========================================= */
+
+        .host-controls {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+        }
+
+        .host-controls h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        .change-video-btn {
+            width: 100%;
+            padding: 11px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            background: var(--cyan);
+            color: #000;
+        }
+
+        .change-video-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .change-video-panel {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .change-video-panel.active {
+            display: block;
+        }
+
+        .video-option {
+            margin-bottom: 12px;
+        }
+
+        .video-option label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .video-option input[type="text"],
+        .video-option input[type="file"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: inherit;
+        }
+
+        .change-submit {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            background: #ffffff;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .cancel-change {
+            width: 100%;
+            margin-top: 7px;
+            padding: 9px;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        /* =========================================
+           QUIT
+        ========================================= */
+
+        .quit-room-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            white-space: nowrap;
+        }
+
+        .quit-room-btn:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        /* =========================================
+           SOURCE LABEL
+        ========================================= */
+
+        .source-label {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* =========================================
+           SYNC STATUS
+        ========================================= */
+
+        .sync-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 50;
+            padding: 7px 10px;
+            border-radius: 7px;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            font-size: 11px;
+            display: none;
+        }
+
+        .sync-status.show {
+            display: block;
+        }
+
+        /* =========================================
+           ENABLE PLAYBACK
+        ========================================= */
+
+        .enable-playback {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.65);
+        }
+
+        .enable-playback.show {
+            display: flex;
+        }
+
+        .enable-playback button {
+            padding: 14px 22px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            background: var(--cyan);
+            color: #000;
+        }
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
 
         @media (max-width: 800px) {
 
             .room-layout {
-
                 grid-template-columns: 1fr;
+            }
 
+            .room-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
         }
@@ -178,6 +354,10 @@
 
 <body>
 
+    <!-- =========================================
+         BACKGROUND
+    ========================================= -->
+
     <div class="background">
 
         <div class="orb orb-1"></div>
@@ -188,6 +368,10 @@
 
     </div>
 
+
+    <!-- =========================================
+         NAVBAR
+    ========================================= -->
 
     <header class="navbar">
 
@@ -210,55 +394,183 @@
     </header>
 
 
+    <!-- =========================================
+         MAIN
+    ========================================= -->
+
     <main class="room-container">
 
+        <!-- =====================================
+             ROOM HEADER
+        ===================================== -->
 
         <div class="room-header">
 
             <div class="room-title">
 
-                <h1>
+                <h1 id="roomName">
                     {{ room["room_name"] }}
                 </h1>
 
-            <div class="room-code-display">
+                <div class="room-code-display">
 
-                ROOM CODE:
-                {{ room["room_code"] }}
+                    ROOM CODE:
+                    {{ room["room_code"] }}
+
+                </div>
+
+                <div class="source-label" id="videoSourceLabel">
+
+                    {% if room["video_type"] == "youtube" %}
+
+                    YouTube
+
+                    {% elif room["video_type"] == "upload" %}
+
+                    Uploaded Video
+
+                    {% else %}
+
+                    No Video
+
+                    {% endif %}
+
+                </div>
 
             </div>
 
+
+            <a href="{{ url_for('quit_room', room_code=room['room_code']) }}?player_id={{ player_id }}"
+               class="quit-room-btn">
+
+                🚪 QUIT ROOM
+
+            </a>
+
         </div>
-        
-        <a
-            href="{{ url_for('quit_room', room_code=room['room_code']) }}"
-            class="quit-room-btn"
-        >
 
-            🚪 QUIT ROOM
 
-        </a>
-
-    </div>
-
+        <!-- =====================================
+             ROOM LAYOUT
+        ===================================== -->
 
         <div class="room-layout">
 
 
+            <!-- =================================
+                 VIDEO
+            ================================= -->
+
             <section class="video-section">
 
-                <div class="video-placeholder">
+                <div class="video-container">
 
-                    <span>🎬</span>
 
-                    <p>
-                        Video player coming next
-                    </p>
+                    <!-- =================================
+                         UPLOADED VIDEO
+                    ================================= -->
+
+                    {% if room["video_type"] == "upload" %}
+
+                    <video id="videoPlayer"
+                           controls
+                           playsinline
+                           preload="metadata">
+
+                        <source
+                            src="{{ url_for('temporary_video', room_code=room['room_code']) }}">
+
+                        Your browser does not support video playback.
+
+                    </video>
+
+
+                    <!-- =================================
+                         YOUTUBE
+                    ================================= -->
+
+                    {% elif room["video_type"] == "youtube" %}
+
+                    <div id="youtubePlayer"
+                         data-video-id="{{ room['video_source'] }}">
+                    </div>
+
+
+                    <!-- =================================
+                         NO VIDEO
+                    ================================= -->
+
+                    {% else %}
+
+                    <div class="video-placeholder"
+                         id="videoPlaceholder">
+
+                        <div>
+
+                            <span>🎬</span>
+
+                            <p>
+                                No video selected
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================
+                         SYNC STATUS
+                    ================================= -->
+
+                    <div id="syncStatus"
+                         class="sync-status">
+
+                        Syncing...
+
+                    </div>
+
+
+                    <!-- =================================
+                         PLAYBACK BUTTON
+                    ================================= -->
+
+                    <div id="enablePlayback"
+                         class="enable-playback">
+
+                        <button type="button"
+                                id="enablePlaybackButton">
+
+                            ▶ ENABLE PLAYBACK
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- =================================
+                         VIDEO INFO
+                    ================================= -->
+
+                    <div class="video-info">
+
+                        <span id="currentVideoName">
+
+                            {{ room["video_name"] or "No video" }}
+
+                        </span>
+
+                    </div>
 
                 </div>
 
             </section>
 
+
+            <!-- =====================================
+                 SIDEBAR
+            ===================================== -->
 
             <aside class="sidebar">
 
@@ -266,26 +578,34 @@
 
                     👥 Players
 
-                    ({{ participants|length }}/{{ room["max_players"] }})
+                    <span id="playerCount">
+
+                        ({{ participants|length }}/{{ room["max_players"] }})
+
+                    </span>
 
                 </div>
 
 
-                <div class="players">
+                <div class="players"
+                     id="playersList">
 
                     {% for participant in participants %}
 
-                    <div class="player">
+                    <div class="player"
+                         data-player-id="{{ participant['player_id'] }}">
 
                         <span class="online"></span>
 
                         {{ participant["player_name"] }}
 
-                        {% if participant["player_name"] == room["creator"] %}
+                        {% if participant["player_id"] == room["creator_player_id"] %}
 
-                        <small>
+                        <span class="host-badge">
+
                             👑 HOST
-                        </small>
+
+                        </span>
 
                         {% endif %}
 
@@ -295,15 +615,1478 @@
 
                 </div>
 
-            </aside>
 
+                <!-- =================================
+                     HOST CONTROLS
+                ================================= -->
+
+                {% if player_id == room["creator_player_id"] %}
+
+                <div class="host-controls">
+
+                    <h3>
+                        🎬 Host Controls
+                    </h3>
+
+                    <button type="button"
+                            class="change-video-btn"
+                            id="changeVideoButton">
+
+                        🔄 CHANGE VIDEO
+
+                    </button>
+
+
+                    <div class="change-video-panel"
+                         id="changeVideoPanel">
+
+                        <form method="POST"
+                              action="{{ url_for('change_video', room_code=room['room_code']) }}"
+                              enctype="multipart/form-data">
+
+                            <input type="hidden"
+                                   name="player_id"
+                                   value="{{ player_id }}">
+
+
+                            <div class="video-option">
+
+                                <label>
+                                    Upload a new video
+                                </label>
+
+                                <input type="file"
+                                       name="video_file"
+                                       accept="video/*"
+                                       id="uploadInput">
+
+                            </div>
+
+
+                            <div style="
+                                text-align:center;
+                                margin:10px 0;
+                                font-size:12px;
+                                opacity:0.6;
+                            ">
+
+                                OR
+
+                            </div>
+
+
+                            <div class="video-option">
+
+                                <label>
+                                    YouTube URL
+                                </label>
+
+                                <input type="text"
+                                       name="youtube_url"
+                                       placeholder="https://youtube.com/watch?v=..."
+                                       id="youtubeInput">
+
+                            </div>
+
+
+                            <input type="hidden"
+                                   name="video_type"
+                                   id="videoType"
+                                   value="youtube">
+
+
+                            <button type="submit"
+                                    class="change-submit">
+
+                                ▶ START NEW VIDEO
+
+                            </button>
+
+
+                            <button type="button"
+                                    class="cancel-change"
+                                    id="cancelChange">
+
+                                Cancel
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            </aside>
 
         </div>
 
     </main>
 
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- =========================================
+         SOCKET.IO
+    ========================================= -->
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+
+    <!-- =========================================
+         YOUTUBE IFRAME API
+    ========================================= -->
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+
+    <script>
+
+        /* =========================================
+           BASIC VARIABLES
+        ========================================= */
+
+        const socket = io();
+
+        const roomCode =
+            "{{ room['room_code'] }}";
+
+        const playerId =
+            "{{ player_id }}";
+
+        const maxPlayers =
+            {{ room["max_players"] }};
+
+        let isHost =
+            playerId ===
+            "{{ room['creator_player_id'] }}";
+
+
+        /*
+         * Prevents remote updates from
+         * being sent back to the server.
+         */
+
+        let applyingRemoteUpdate = false;
+
+
+        /*
+         * Prevents YouTube events from
+         * creating feedback loops.
+         */
+
+        let youtubeReady = false;
+
+        let youtubePlayer = null;
+
+        let youtubeVideoId = null;
+
+        let lastRemoteTime = 0;
+
+
+        /* =========================================
+           ELEMENTS
+        ========================================= */
+
+        const videoPlayer =
+            document.getElementById(
+                "videoPlayer"
+            );
+
+
+        const youtubeContainer =
+            document.getElementById(
+                "youtubePlayer"
+            );
+
+
+        const syncStatus =
+            document.getElementById(
+                "syncStatus"
+            );
+
+
+        const enablePlayback =
+            document.getElementById(
+                "enablePlayback"
+            );
+
+
+        const enablePlaybackButton =
+            document.getElementById(
+                "enablePlaybackButton"
+            );
+
+
+        /* =========================================
+           YOUTUBE VIDEO ID
+        ========================================= */
+
+        if (youtubeContainer) {
+
+            youtubeVideoId =
+                youtubeContainer.dataset.videoId;
+
+        }
+
+
+        /* =========================================
+           SYNC STATUS
+        ========================================= */
+
+        function showSyncStatus(message) {
+
+            if (!syncStatus) {
+                return;
+            }
+
+            syncStatus.textContent =
+                message;
+
+            syncStatus.classList.add(
+                "show"
+            );
+
+            setTimeout(
+                function () {
+
+                    syncStatus.classList.remove(
+                        "show"
+                    );
+
+                },
+                1000
+            );
+
+        }
+
+
+        /* =========================================
+           SOCKET CONNECT
+        ========================================= */
+
+        socket.on(
+            "connect",
+            function () {
+
+                socket.emit(
+                    "join_watch_room",
+                    {
+                        room_code:
+                            roomCode,
+
+                        player_id:
+                            playerId
+                    }
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           ROOM STATE
+        ========================================= */
+
+        socket.on(
+            "room_state",
+            function (state) {
+
+                updatePlayers(state);
+
+                updateHostStatus(state);
+
+                updateVideoInfo(state);
+
+            }
+        );
+
+
+        /* =========================================
+           ROOM UPDATED
+        ========================================= */
+
+        socket.on(
+            "room_updated",
+            function (state) {
+
+                updatePlayers(state);
+
+                updateHostStatus(state);
+
+                updateVideoInfo(state);
+
+            }
+        );
+
+
+        /* =========================================
+           UPDATE PLAYERS
+        ========================================= */
+
+        function updatePlayers(state) {
+
+            const playersList =
+                document.getElementById(
+                    "playersList"
+                );
+
+
+            const playerCount =
+                document.getElementById(
+                    "playerCount"
+                );
+
+
+            if (!playersList) {
+                return;
+            }
+
+
+            playerCount.textContent =
+                "(" +
+                state.participants.length +
+                "/" +
+                state.max_players +
+                ")";
+
+
+            playersList.innerHTML = "";
+
+
+            state.participants.forEach(
+                function (participant) {
+
+                    const player =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    player.className =
+                        "player";
+
+
+                    player.dataset.playerId =
+                        participant.player_id;
+
+
+                    const online =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    online.className =
+                        "online";
+
+
+                    player.appendChild(
+                        online
+                    );
+
+
+                    const name =
+                        document.createTextNode(
+                            participant.player_name
+                        );
+
+
+                    player.appendChild(
+                        name
+                    );
+
+
+                    if (
+                        participant.player_id ===
+                        state.creator_player_id
+                    ) {
+
+                        const hostBadge =
+                            document.createElement(
+                                "span"
+                            );
+
+
+                        hostBadge.className =
+                            "host-badge";
+
+
+                        hostBadge.textContent =
+                            "👑 HOST";
+
+
+                        player.appendChild(
+                            hostBadge
+                        );
+
+                    }
+
+
+                    playersList.appendChild(
+                        player
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           UPDATE HOST STATUS
+        ========================================= */
+
+        function updateHostStatus(state) {
+
+            const newHostStatus =
+                playerId ===
+                state.creator_player_id;
+
+
+            const hostChanged =
+                newHostStatus !== isHost;
+
+
+            isHost =
+                newHostStatus;
+
+
+            const existingControls =
+                document.querySelector(
+                    ".host-controls"
+                );
+
+
+            if (hostChanged) {
+
+                setTimeout(
+                    function () {
+
+                        window.location.reload();
+
+                    },
+                    200
+                );
+
+                return;
+
+            }
+
+
+            if (
+                isHost &&
+                !existingControls
+            ) {
+
+                window.location.reload();
+
+            }
+
+
+            if (
+                !isHost &&
+                existingControls
+            ) {
+
+                window.location.reload();
+
+            }
+
+        }
+
+
+        /* =========================================
+           UPDATE VIDEO INFORMATION
+        ========================================= */
+
+        function updateVideoInfo(state) {
+
+            const videoName =
+                document.getElementById(
+                    "currentVideoName"
+                );
+
+
+            const sourceLabel =
+                document.getElementById(
+                    "videoSourceLabel"
+                );
+
+
+            if (videoName) {
+
+                videoName.textContent =
+                    state.video_name ||
+                    "No video";
+
+            }
+
+
+            if (sourceLabel) {
+
+                if (
+                    state.video_type ===
+                    "youtube"
+                ) {
+
+                    sourceLabel.textContent =
+                        "YouTube";
+
+                }
+                else if (
+                    state.video_type ===
+                    "upload"
+                ) {
+
+                    sourceLabel.textContent =
+                        "Uploaded Video";
+
+                }
+                else {
+
+                    sourceLabel.textContent =
+                        "No Video";
+
+                }
+
+            }
+
+        }
+
+
+        /* =========================================
+           YOUTUBE API READY
+           ========================================= */
+
+        function onYouTubeIframeAPIReady() {
+
+            if (!youtubeContainer) {
+                return;
+            }
+
+
+            if (!youtubeVideoId) {
+                return;
+            }
+
+
+            createYouTubePlayer();
+
+        }
+
+
+        /* =========================================
+           CREATE YOUTUBE PLAYER
+           ========================================= */
+
+        function createYouTubePlayer() {
+
+            if (!window.YT) {
+                return;
+            }
+
+
+            youtubePlayer =
+                new YT.Player(
+                    "youtubePlayer",
+                    {
+
+                        videoId:
+                            youtubeVideoId,
+
+                        playerVars: {
+
+                            autoplay: 0,
+
+                            controls: 1,
+
+                            rel: 0,
+
+                            modestbranding: 1,
+
+                            playsinline: 1
+
+                        },
+
+                        events: {
+
+                            onReady:
+                                handleYouTubeReady,
+
+                            onStateChange:
+                                handleYouTubeStateChange,
+
+                            onError:
+                                handleYouTubeError
+
+                        }
+
+                    }
+                );
+
+        }
+
+
+        /* =========================================
+           YOUTUBE READY
+        ========================================= */
+
+        function handleYouTubeReady(event) {
+
+            youtubeReady = true;
+
+            console.log(
+                "YouTube player ready."
+            );
+
+
+            /*
+             * We intentionally do NOT autoplay
+             * immediately.
+             *
+             * The browser may block autoplay.
+             */
+
+        }
+
+
+        /* =========================================
+           YOUTUBE STATE CHANGE
+        ========================================= */
+
+        function handleYouTubeStateChange(event) {
+
+            if (!youtubeReady) {
+                return;
+            }
+
+
+            /*
+             * Ignore state changes caused by
+             * remote synchronization.
+             */
+
+            if (applyingRemoteUpdate) {
+                return;
+            }
+
+
+            /*
+             * Only the HOST is allowed to
+             * broadcast controls.
+             */
+
+            if (!isHost) {
+                return;
+            }
+
+
+            const currentTime =
+                youtubePlayer.getCurrentTime();
+
+
+            /* PLAYING */
+
+            if (
+                event.data ===
+                YT.PlayerState.PLAYING
+            ) {
+
+                socket.emit(
+                    "video_play",
+                    {
+
+                        room_code:
+                            roomCode,
+
+                        player_id:
+                            playerId,
+
+                        current_time:
+                            currentTime
+
+                    }
+                );
+
+            }
+
+
+            /* PAUSED */
+
+            else if (
+                event.data ===
+                YT.PlayerState.PAUSED
+            ) {
+
+                socket.emit(
+                    "video_pause",
+                    {
+
+                        room_code:
+                            roomCode,
+
+                        player_id:
+                            playerId,
+
+                        current_time:
+                            currentTime
+
+                    }
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           YOUTUBE ERROR
+        ========================================= */
+
+        function handleYouTubeError(event) {
+
+            console.log(
+                "YouTube error:",
+                event.data
+            );
+
+        }
+
+
+        /* =========================================
+           NATIVE VIDEO EVENTS
+        ========================================= */
+
+        if (videoPlayer) {
+
+            /* PLAY */
+
+            videoPlayer.addEventListener(
+                "play",
+                function () {
+
+                    if (!isHost) {
+                        return;
+                    }
+
+                    if (applyingRemoteUpdate) {
+                        return;
+                    }
+
+
+                    socket.emit(
+                        "video_play",
+                        {
+
+                            room_code:
+                                roomCode,
+
+                            player_id:
+                                playerId,
+
+                            current_time:
+                                videoPlayer.currentTime
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /* PAUSE */
+
+            videoPlayer.addEventListener(
+                "pause",
+                function () {
+
+                    if (!isHost) {
+                        return;
+                    }
+
+                    if (applyingRemoteUpdate) {
+                        return;
+                    }
+
+
+                    socket.emit(
+                        "video_pause",
+                        {
+
+                            room_code:
+                                roomCode,
+
+                            player_id:
+                                playerId,
+
+                            current_time:
+                                videoPlayer.currentTime
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /* SEEK */
+
+            videoPlayer.addEventListener(
+                "seeked",
+                function () {
+
+                    if (!isHost) {
+                        return;
+                    }
+
+                    if (applyingRemoteUpdate) {
+                        return;
+                    }
+
+
+                    socket.emit(
+                        "video_seek",
+                        {
+
+                            room_code:
+                                roomCode,
+
+                            player_id:
+                                playerId,
+
+                            current_time:
+                                videoPlayer.currentTime
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           REMOTE PLAY
+        ========================================= */
+
+        socket.on(
+            "video_play",
+            function (data) {
+
+                if (isHost) {
+                    return;
+                }
+
+
+                applyingRemoteUpdate = true;
+
+
+                const time =
+                    Number(
+                        data.current_time
+                    );
+
+
+                lastRemoteTime =
+                    time;
+
+
+                /* UPLOADED VIDEO */
+
+                if (videoPlayer) {
+
+                    videoPlayer.currentTime =
+                        time;
+
+
+                    const promise =
+                        videoPlayer.play();
+
+
+                    if (
+                        promise !== undefined
+                    ) {
+
+                        promise
+                            .then(
+                                function () {
+
+                                    if (enablePlayback) {
+
+                                        enablePlayback.classList.remove(
+                                            "show"
+                                        );
+
+                                    }
+
+                                }
+                            )
+                            .catch(
+                                function () {
+
+                                    if (enablePlayback) {
+
+                                        enablePlayback.classList.add(
+                                            "show"
+                                        );
+
+                                    }
+
+                                }
+                            )
+                            .finally(
+                                function () {
+
+                                    setTimeout(
+                                        function () {
+
+                                            applyingRemoteUpdate =
+                                                false;
+
+                                        },
+                                        100
+                                    );
+
+                                }
+                            );
+
+                    }
+                    else {
+
+                        setTimeout(
+                            function () {
+
+                                applyingRemoteUpdate =
+                                    false;
+
+                            },
+                            100
+                        );
+
+                    }
+
+                    return;
+                }
+
+
+                /* YOUTUBE */
+
+                if (
+                    youtubePlayer &&
+                    youtubeReady
+                ) {
+
+                    youtubePlayer.seekTo(
+                        time,
+                        true
+                    );
+
+
+                    const promise =
+                        youtubePlayer.playVideo();
+
+
+                    /*
+                     * YouTube's playVideo()
+                     * does not reliably return
+                     * a normal Promise.
+                     *
+                     * Give the browser a moment,
+                     * then remove the remote flag.
+                     */
+
+                    setTimeout(
+                        function () {
+
+                            applyingRemoteUpdate =
+                                false;
+
+                        },
+                        300
+                    );
+
+
+                    return;
+                }
+
+
+                applyingRemoteUpdate =
+                    false;
+
+            }
+        );
+
+
+        /* =========================================
+           REMOTE PAUSE
+        ========================================= */
+
+        socket.on(
+            "video_pause",
+            function (data) {
+
+                if (isHost) {
+                    return;
+                }
+
+
+                applyingRemoteUpdate = true;
+
+
+                const time =
+                    Number(
+                        data.current_time
+                    );
+
+
+                lastRemoteTime =
+                    time;
+
+
+                /* UPLOADED VIDEO */
+
+                if (videoPlayer) {
+
+                    videoPlayer.currentTime =
+                        time;
+
+                    videoPlayer.pause();
+
+
+                    setTimeout(
+                        function () {
+
+                            applyingRemoteUpdate =
+                                false;
+
+                        },
+                        100
+                    );
+
+
+                    return;
+
+                }
+
+
+                /* YOUTUBE */
+
+                if (
+                    youtubePlayer &&
+                    youtubeReady
+                ) {
+
+                    youtubePlayer.seekTo(
+                        time,
+                        true
+                    );
+
+                    youtubePlayer.pauseVideo();
+
+
+                    setTimeout(
+                        function () {
+
+                            applyingRemoteUpdate =
+                                false;
+
+                        },
+                        300
+                    );
+
+
+                    return;
+
+                }
+
+
+                applyingRemoteUpdate =
+                    false;
+
+            }
+        );
+
+
+        /* =========================================
+           REMOTE SEEK
+        ========================================= */
+
+        socket.on(
+            "video_seek",
+            function (data) {
+
+                if (isHost) {
+                    return;
+                }
+
+
+                applyingRemoteUpdate = true;
+
+
+                const time =
+                    Number(
+                        data.current_time
+                    );
+
+
+                lastRemoteTime =
+                    time;
+
+
+                /* UPLOADED VIDEO */
+
+                if (videoPlayer) {
+
+                    videoPlayer.currentTime =
+                        time;
+
+
+                    setTimeout(
+                        function () {
+
+                            applyingRemoteUpdate =
+                                false;
+
+                        },
+                        100
+                    );
+
+
+                    return;
+
+                }
+
+
+                /* YOUTUBE */
+
+                if (
+                    youtubePlayer &&
+                    youtubeReady
+                ) {
+
+                    youtubePlayer.seekTo(
+                        time,
+                        true
+                    );
+
+
+                    setTimeout(
+                        function () {
+
+                            applyingRemoteUpdate =
+                                false;
+
+                        },
+                        300
+                    );
+
+
+                    return;
+
+                }
+
+
+                applyingRemoteUpdate =
+                    false;
+
+            }
+        );
+
+
+        /* =========================================
+           ENABLE PLAYBACK
+        ========================================= */
+
+        if (enablePlaybackButton) {
+
+            enablePlaybackButton.addEventListener(
+                "click",
+                function () {
+
+                    /*
+                     * YOUTUBE
+                     */
+
+                    if (
+                        youtubePlayer &&
+                        youtubeReady &&
+                        !isHost
+                    ) {
+
+                        applyingRemoteUpdate =
+                            true;
+
+
+                        youtubePlayer.seekTo(
+                            lastRemoteTime,
+                            true
+                        );
+
+
+                        youtubePlayer.playVideo();
+
+
+                        enablePlayback.classList.remove(
+                            "show"
+                        );
+
+
+                        setTimeout(
+                            function () {
+
+                                applyingRemoteUpdate =
+                                    false;
+
+                            },
+                            500
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * UPLOADED VIDEO
+                     */
+
+                    if (videoPlayer) {
+
+                        videoPlayer.play()
+                            .then(
+                                function () {
+
+                                    enablePlayback.classList.remove(
+                                        "show"
+                                    );
+
+                                }
+                            )
+                            .catch(
+                                function (error) {
+
+                                    console.log(
+                                        "Playback could not start:",
+                                        error
+                                    );
+
+                                }
+                            );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           CHANGE VIDEO PANEL
+        ========================================= */
+
+        const changeButton =
+            document.getElementById(
+                "changeVideoButton"
+            );
+
+
+        const changePanel =
+            document.getElementById(
+                "changeVideoPanel"
+            );
+
+
+        const cancelButton =
+            document.getElementById(
+                "cancelChange"
+            );
+
+
+        if (changeButton) {
+
+            changeButton.addEventListener(
+                "click",
+                function () {
+
+                    changePanel.classList.toggle(
+                        "active"
+                    );
+
+                }
+            );
+
+        }
+
+
+        if (cancelButton) {
+
+            cancelButton.addEventListener(
+                "click",
+                function () {
+
+                    changePanel.classList.remove(
+                        "active"
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           VIDEO TYPE DETECTION
+        ========================================= */
+
+        const uploadInput =
+            document.getElementById(
+                "uploadInput"
+            );
+
+
+        const youtubeInput =
+            document.getElementById(
+                "youtubeInput"
+            );
+
+
+        const videoType =
+            document.getElementById(
+                "videoType"
+            );
+
+
+        if (uploadInput) {
+
+            uploadInput.addEventListener(
+                "change",
+                function () {
+
+                    if (
+                        uploadInput.files.length > 0
+                    ) {
+
+                        videoType.value =
+                            "upload";
+
+
+                        if (youtubeInput) {
+
+                            youtubeInput.value =
+                                "";
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (youtubeInput) {
+
+            youtubeInput.addEventListener(
+                "input",
+                function () {
+
+                    if (
+                        youtubeInput.value.trim()
+                        !==
+                        ""
+                    ) {
+
+                        videoType.value =
+                            "youtube";
+
+
+                        if (uploadInput) {
+
+                            uploadInput.value =
+                                "";
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           VIDEO CHANGED
+        ========================================= */
+
+        socket.on(
+            "video_changed",
+            function (state) {
+
+                /*
+                 * Reloading is intentional.
+                 *
+                 * It creates the correct video
+                 * player for the new source.
+                 */
+
+                window.location.reload();
+
+            }
+        );
+
+
+        /* =========================================
+           ROOM DELETED
+        ========================================= */
+
+        socket.on(
+            "room_deleted",
+            function (data) {
+
+                alert(
+                    data.message ||
+                    "The watch party has ended."
+                );
+
+
+                window.location.href =
+                    "{{ url_for('home') }}";
+
+            }
+        );
+
+
+        /* =========================================
+           LEAVE SOCKET ROOM
+        ========================================= */
+
+        window.addEventListener(
+            "beforeunload",
+            function () {
+
+                socket.emit(
+                    "leave_watch_room",
+                    {
+                        room_code:
+                            roomCode
+                    }
+                );
+
+            }
+        );
+
+    </script>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}">
+    </script>
+
 
 </body>
 

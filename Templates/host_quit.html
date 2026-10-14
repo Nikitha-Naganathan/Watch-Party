@@ -7,14 +7,18 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Leave Room | Watch//Party</title>
+    <title>Leave Watch Party | Watch//Party</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <style>
+        /* ==============================
+           PAGE
+        ============================== */
+
         .quit-container {
 
-            min-height: calc(100vh - 80px);
+            min-height: 80vh;
 
             display: flex;
 
@@ -26,158 +30,285 @@
 
         }
 
+
+        /* ==============================
+           QUIT CARD
+        ============================== */
+
         .quit-card {
 
-            width: min(600px, 100%);
+            width: 100%;
 
-            padding: 45px;
+            max-width: 520px;
+
+            padding: 40px;
 
             text-align: center;
+
+            background: var(--surface);
 
             border: 1px solid var(--border);
 
             border-radius: 20px;
 
-            background: var(--surface);
-
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(15px);
 
             box-shadow:
-                0 0 50px rgba(236, 72, 153, 0.12);
+                0 0 40px rgba(0, 0, 0, 0.3);
 
         }
 
-        .warning-icon {
 
-            font-size: 60px;
+        .quit-icon {
 
-            margin-bottom: 20px;
-
-        }
-
-        .quit-card h1 {
-
-            font-size: 36px;
-
-            letter-spacing: -1px;
+            font-size: 55px;
 
             margin-bottom: 15px;
 
+            animation: floatIcon 2.5s ease-in-out infinite;
+
         }
+
+
+        @keyframes floatIcon {
+
+            0%,
+            100% {
+
+                transform: translateY(0);
+
+            }
+
+            50% {
+
+                transform: translateY(-8px);
+
+            }
+
+        }
+
+
+        .quit-card h1 {
+
+            font-size: 28px;
+
+            margin-bottom: 10px;
+
+        }
+
 
         .quit-card p {
 
             color: var(--muted);
 
+            font-size: 14px;
+
             line-height: 1.6;
 
-            margin-bottom: 30px;
+            margin-bottom: 25px;
 
         }
 
+
+        /* ==============================
+           ROOM INFO
+        ============================== */
+
         .room-name {
+
+            padding: 12px 16px;
+
+            margin-bottom: 25px;
+
+            border-radius: 10px;
+
+            background: rgba(255, 255, 255, 0.04);
+
+            border: 1px solid var(--border);
 
             color: var(--cyan);
 
             font-weight: bold;
 
-            margin-bottom: 30px;
+        }
+
+
+        /* ==============================
+           BUTTONS
+        ============================== */
+
+        .quit-actions {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
 
         }
 
-        .quit-options {
 
-            display: grid;
+        .action-btn {
 
-            grid-template-columns: 1fr 1fr;
+            width: 100%;
 
-            gap: 15px;
-
-        }
-
-        .delete-btn,
-        .leave-btn,
-        .cancel-btn {
-
-            padding: 15px;
+            padding: 14px 20px;
 
             border-radius: 10px;
+
+            font-size: 14px;
 
             font-weight: bold;
 
             cursor: pointer;
 
-            font-size: 14px;
-
             transition: 0.3s;
 
         }
+
+
+        /* DELETE */
 
         .delete-btn {
 
             border: 1px solid rgba(239, 68, 68, 0.5);
 
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.08);
 
             color: #f87171;
 
         }
 
+
         .delete-btn:hover {
 
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.18);
+
+            border-color: #f87171;
 
             box-shadow:
                 0 0 20px rgba(239, 68, 68, 0.2);
 
+            transform: translateY(-2px);
+
         }
+
+
+        /* LEAVE */
 
         .leave-btn {
 
-            border: none;
+            border: 1px solid rgba(250, 204, 21, 0.4);
 
-            background: linear-gradient(90deg,
-                    var(--purple),
-                    var(--pink));
+            background: rgba(250, 204, 21, 0.07);
 
-            color: white;
+            color: #facc15;
 
         }
+
 
         .leave-btn:hover {
 
-            transform: translateY(-3px);
+            background: rgba(250, 204, 21, 0.14);
+
+            border-color: #facc15;
 
             box-shadow:
-                0 0 25px rgba(236, 72, 153, 0.35);
+                0 0 20px rgba(250, 204, 21, 0.15);
+
+            transform: translateY(-2px);
 
         }
+
+
+        /* CANCEL */
 
         .cancel-btn {
 
+            display: block;
+
             width: 100%;
 
-            margin-top: 15px;
+            padding: 14px 20px;
+
+            box-sizing: border-box;
+
+            border-radius: 10px;
 
             border: 1px solid var(--border);
 
-            background: transparent;
+            background: rgba(255, 255, 255, 0.03);
 
-            color: var(--text);
+            color: var(--muted);
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            transition: 0.3s;
 
         }
+
 
         .cancel-btn:hover {
 
-            border-color: var(--cyan);
+            background: rgba(255, 255, 255, 0.07);
+
+            color: white;
+
+            transform: translateY(-2px);
 
         }
 
+
+        /* ==============================
+           WARNING
+        ============================== */
+
+        .warning {
+
+            margin-top: 22px;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            background: rgba(239, 68, 68, 0.05);
+
+            border: 1px solid rgba(239, 68, 68, 0.15);
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+        }
+
+
+        /* ==============================
+           MOBILE
+        ============================== */
+
         @media (max-width: 600px) {
 
-            .quit-options {
+            .quit-container {
 
-                grid-template-columns: 1fr;
+                padding: 20px;
+
+            }
+
+            .quit-card {
+
+                padding: 30px 22px;
+
+            }
+
+            .quit-card h1 {
+
+                font-size: 24px;
 
             }
 
@@ -188,6 +319,11 @@
 
 
 <body>
+
+
+    <!-- ==================================
+         BACKGROUND
+    =================================== -->
 
     <div class="background">
 
@@ -200,6 +336,10 @@
     </div>
 
 
+    <!-- ==================================
+         NAVBAR
+    =================================== -->
+
     <header class="navbar">
 
         <div class="logo">
@@ -210,28 +350,48 @@
 
         </div>
 
+
+        <div class="nav-right">
+
+            <button id="themeToggle">
+
+                ☀
+
+            </button>
+
+        </div>
+
     </header>
 
 
+    <!-- ==================================
+         MAIN
+    =================================== -->
+
     <main class="quit-container">
+
 
         <div class="quit-card">
 
-            <div class="warning-icon">
-                👑
+
+            <div class="quit-icon">
+
+                🚪
+
             </div>
 
+
             <h1>
+
                 Leaving the Party?
+
             </h1>
+
 
             <p>
 
                 You are the host of this watch party.
-
-                <br>
-
-                What would you like to do with the room?
+                What would you like to do?
 
             </p>
 
@@ -243,11 +403,22 @@
             </div>
 
 
-            <div class="quit-options">
+            <!-- ==================================
+                 ACTIONS
+            =================================== -->
 
-                <form method="POST" action="{{ url_for('delete_room', room_code=room['room_code']) }}">
+            <div class="quit-actions">
 
-                    <button type="submit" class="delete-btn">
+
+                <!-- DELETE ROOM -->
+
+                <form method="POST" action="{{ url_for('delete_room', room_code=room['room_code']) }}"
+                    onsubmit="return confirmDelete();">
+
+                    <input type="hidden" name="player_id" value="{{ player_id }}">
+
+
+                    <button type="submit" class="action-btn delete-btn">
 
                         🗑️ DELETE ROOM
 
@@ -256,29 +427,98 @@
                 </form>
 
 
-                <form method="POST" action="{{ url_for('leave_room', room_code=room['room_code']) }}">
+                <!-- LEAVE ROOM -->
 
-                    <button type="submit" class="leave-btn">
+                <form method="POST" action="{{ url_for('leave_room_route', room_code=room['room_code']) }}"
+                    onsubmit="return confirmLeave();">
 
-                        🚪 LEAVE ROOM
+                    <input type="hidden" name="player_id" value="{{ player_id }}">
+
+
+                    <button type="submit" class="action-btn leave-btn">
+
+                        🚪 LEAVE & TRANSFER HOST
 
                     </button>
 
                 </form>
 
+
+                <!-- CANCEL -->
+
+                <a href="{{ url_for(
+                        'watch_room',
+                        room_code=room['room_code'],
+                        player_id=player_id
+                    ) }}" class="cancel-btn">
+
+                    ← CANCEL
+
+                </a>
+
+
             </div>
 
 
-            <a href="{{ url_for('watch_room', room_code=room['room_code']) }}" class="cancel-btn"
-                style="display:block; text-decoration:none;">
+            <!-- ==================================
+                 WARNING
+            =================================== -->
 
-                CANCEL
+            <div class="warning">
 
-            </a>
+                <strong>Delete Room:</strong>
+
+                Everyone will be removed and the
+                watch party will permanently end.
+
+
+                <br><br>
+
+
+                <strong>Leave & Transfer Host:</strong>
+
+                You will leave the room and the next
+                player will automatically become the host.
+
+            </div>
+
 
         </div>
 
+
     </main>
+
+
+    <!-- ==================================
+         JAVASCRIPT
+    =================================== -->
+
+    <script>
+
+        function confirmDelete() {
+
+            return confirm(
+                "Are you sure you want to DELETE this room?\n\n" +
+                "All players will be removed and the watch party will end."
+            );
+
+        }
+
+
+        function confirmLeave() {
+
+            return confirm(
+                "Are you sure you want to leave?\n\n" +
+                "Another player will automatically become the host."
+            );
+
+        }
+
+    </script>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 
 </body>
 

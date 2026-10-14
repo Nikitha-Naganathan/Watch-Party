@@ -1,0 +1,7 @@
+temporary_videos/
+*.mp4
+*.webm
+*.ogg
+*.mov
+*.m4v
+__pycache__/

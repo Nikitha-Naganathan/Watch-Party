@@ -4,96 +4,160 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Create Room | Watch//Party</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 
     <style>
+
         .create-container {
+
             width: min(700px, 92%);
+
             margin: 50px auto;
+
         }
 
+
         .create-card {
+
             padding: 40px;
+
             border: 1px solid var(--border);
+
             border-radius: 20px;
+
             background: var(--surface);
+
             backdrop-filter: blur(20px);
 
             box-shadow:
                 0 0 40px rgba(168, 85, 247, 0.12);
+
         }
+
 
         .page-title {
+
             font-size: 38px;
+
             margin-bottom: 10px;
+
         }
+
 
         .page-description {
+
             color: var(--muted);
+
             margin-bottom: 35px;
+
         }
+
 
         .form-group {
+
             margin-bottom: 25px;
+
             text-align: left;
+
         }
 
+
         .form-group label {
+
             display: block;
+
             margin-bottom: 8px;
+
             font-size: 14px;
+
             font-weight: bold;
+
         }
+
 
         .form-group input,
         .form-group select {
+
             width: 100%;
+
+            box-sizing: border-box;
+
             padding: 14px 16px;
 
             border: 1px solid var(--border);
+
             border-radius: 10px;
 
             background: rgba(0, 0, 0, 0.2);
+
             color: var(--text);
 
             outline: none;
 
             font-size: 15px;
+
         }
+
 
         .form-group input:focus,
         .form-group select:focus {
+
             border-color: var(--cyan);
 
             box-shadow:
                 0 0 15px rgba(34, 211, 238, 0.2);
+
         }
 
-        .room-types {
+
+        /* =================================
+           VIDEO SOURCE
+        ================================= */
+
+        .video-source-tabs {
+
             display: grid;
+
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+
+            gap: 12px;
+
+            margin-bottom: 15px;
+
         }
 
-        .room-type {
+
+        .video-source-option {
+
             position: relative;
+
         }
 
-        .room-type input {
+
+        .video-source-option input {
+
             position: absolute;
+
             opacity: 0;
+
         }
 
-        .room-type label {
+
+        .video-source-option label {
+
             display: block;
 
             padding: 18px;
 
             border: 1px solid var(--border);
+
             border-radius: 12px;
 
             text-align: center;
@@ -101,46 +165,196 @@
             cursor: pointer;
 
             transition: 0.3s;
+
         }
 
+
+        .video-source-option label:hover {
+
+            transform: translateY(-2px);
+
+            border-color: var(--purple);
+
+        }
+
+
+        .video-source-option input:checked + label {
+
+            border-color: var(--cyan);
+
+            background: rgba(34, 211, 238, 0.08);
+
+            box-shadow:
+                0 0 20px rgba(34, 211, 238, 0.15);
+
+        }
+
+
+        .video-source-icon {
+
+            display: block;
+
+            font-size: 30px;
+
+            margin-bottom: 7px;
+
+        }
+
+
+        .video-source-box {
+
+            padding: 18px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 12px;
+
+            background: rgba(255, 255, 255, 0.02);
+
+        }
+
+
+        .video-source-box input {
+
+            margin-top: 8px;
+
+        }
+
+
+        .source-help {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            margin-top: 8px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .upload-info {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            margin-top: 8px;
+
+        }
+
+
+        /* =================================
+           ROOM TYPES
+        ================================= */
+
+        .room-types {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+
+        }
+
+
+        .room-type {
+
+            position: relative;
+
+        }
+
+
+        .room-type input {
+
+            position: absolute;
+
+            opacity: 0;
+
+        }
+
+
+        .room-type label {
+
+            display: block;
+
+            padding: 18px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 12px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+
+        }
+
+
         .room-type label:hover {
+
             border-color: var(--purple);
 
             transform: translateY(-2px);
+
         }
 
-        .room-type input:checked+label {
+
+        .room-type input:checked + label {
+
             border-color: var(--pink);
 
             background: rgba(236, 72, 153, 0.1);
 
             box-shadow:
                 0 0 20px rgba(236, 72, 153, 0.15);
+
         }
 
+
+        /* =================================
+           THEMES
+        ================================= */
+
         .theme-grid {
+
             display: grid;
 
             grid-template-columns: repeat(3, 1fr);
 
             gap: 12px;
+
         }
+
 
         .theme-option {
+
             position: relative;
+
         }
+
 
         .theme-option input {
+
             position: absolute;
+
             opacity: 0;
+
         }
 
+
         .theme-option label {
+
             display: block;
 
             padding: 20px 10px;
 
             border: 1px solid var(--border);
+
             border-radius: 12px;
 
             text-align: center;
@@ -148,26 +362,44 @@
             cursor: pointer;
 
             transition: 0.3s;
+
         }
+
 
         .theme-option label:hover {
+
             transform: translateY(-3px);
+
         }
 
-        .theme-option input:checked+label {
+
+        .theme-option input:checked + label {
+
             border-color: var(--cyan);
 
             box-shadow:
                 0 0 20px rgba(34, 211, 238, 0.2);
+
         }
+
 
         .theme-emoji {
+
             display: block;
+
             font-size: 28px;
+
             margin-bottom: 8px;
+
         }
 
+
+        /* =================================
+           BUTTON
+        ================================= */
+
         .create-submit {
+
             width: 100%;
 
             padding: 16px;
@@ -175,30 +407,40 @@
             margin-top: 10px;
 
             border: none;
+
             border-radius: 10px;
 
-            background: linear-gradient(90deg,
-                    var(--purple),
-                    var(--pink));
+            background: linear-gradient(
+                90deg,
+                var(--purple),
+                var(--pink)
+            );
 
             color: white;
 
             font-size: 16px;
+
             font-weight: bold;
 
             cursor: pointer;
 
             transition: 0.3s;
+
         }
 
+
         .create-submit:hover {
+
             transform: translateY(-3px);
 
             box-shadow:
                 0 0 30px rgba(236, 72, 153, 0.4);
+
         }
 
+
         .back-link {
+
             display: block;
 
             margin-top: 20px;
@@ -208,26 +450,64 @@
             color: var(--muted);
 
             text-decoration: none;
+
         }
 
+
         .back-link:hover {
+
             color: var(--cyan);
+
         }
+
+
+        .error-message {
+
+            padding: 12px;
+
+            margin-bottom: 20px;
+
+            border-radius: 8px;
+
+            background: rgba(239, 68, 68, 0.08);
+
+            border: 1px solid rgba(239, 68, 68, 0.3);
+
+            color: #f87171;
+
+            font-size: 13px;
+
+        }
+
 
         @media (max-width: 600px) {
 
             .create-card {
+
                 padding: 25px;
+
             }
 
             .room-types {
+
                 grid-template-columns: 1fr;
+
             }
 
             .theme-grid {
+
                 grid-template-columns: 1fr 1fr;
+
             }
+
+            .video-source-tabs {
+
+                grid-template-columns: 1fr;
+
+            }
+
         }
+
     </style>
 
 </head>
@@ -235,10 +515,13 @@
 
 <body>
 
+
     <div class="background">
 
         <div class="orb orb-1"></div>
+
         <div class="orb orb-2"></div>
+
         <div class="orb orb-3"></div>
 
     </div>
@@ -247,14 +530,20 @@
     <header class="navbar">
 
         <div class="logo">
+
             <span class="logo-icon">▶</span>
+
             WATCH<span>//</span>PARTY
+
         </div>
+
 
         <div class="nav-right">
 
             <button id="themeToggle">
+
                 ☀
+
             </button>
 
         </div>
@@ -264,66 +553,197 @@
 
     <main class="create-container">
 
+
         <div class="create-card">
 
+
             <h1 class="page-title">
+
                 Create Room
+
             </h1>
 
+
             <p class="page-description">
+
                 Set up your watch party and invite your friends.
+
             </p>
 
 
-            <form method="POST">
+            {% if error %}
 
+            <div class="error-message">
+
+                {{ error }}
+
+            </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                id="createRoomForm"
+            >
+
+
+                <!-- =================================
+                     ROOM / VIDEO NAME
+                ================================= -->
 
                 <div class="form-group">
 
                     <label for="room_name">
+
                         🎬 Room / Video Name
+
                     </label>
 
-                    <input type="text" id="room_name" name="room_name" placeholder="Example: Avengers: Endgame"
-                        required>
+
+                    <input
+                        type="text"
+                        id="room_name"
+                        name="room_name"
+                        placeholder="Example: Avengers: Endgame"
+                        required
+                    >
 
                 </div>
 
 
+                <!-- =================================
+                     VIDEO SOURCE
+                ================================= -->
+
                 <div class="form-group">
 
                     <label>
-                        🔐 Room Type
+
+                        🎥 Choose Video Source
+
                     </label>
 
-                    <div class="room-types">
 
-                        <div class="room-type">
+                    <div class="video-source-tabs">
 
-                            <input type="radio" id="public" name="room_type" value="public" checked>
 
-                            <label for="public">
-                                🌐<br>
-                                Public
-                                <small>
-                                    Anyone can find and join
-                                </small>
+                        <div class="video-source-option">
+
+                            <input
+                                type="radio"
+                                id="upload_source"
+                                name="video_type"
+                                value="upload"
+                                checked
+                            >
+
+
+                            <label for="upload_source">
+
+                                <span class="video-source-icon">
+
+                                    📁
+
+                                </span>
+
+                                Upload Video
+
                             </label>
 
                         </div>
 
 
-                        <div class="room-type">
+                        <div class="video-source-option">
 
-                            <input type="radio" id="private" name="room_type" value="private">
+                            <input
+                                type="radio"
+                                id="youtube_source"
+                                name="video_type"
+                                value="youtube"
+                            >
 
-                            <label for="private">
-                                🔒<br>
-                                Private
-                                <small>
-                                    Join using room code
-                                </small>
+
+                            <label for="youtube_source">
+
+                                <span class="video-source-icon">
+
+                                    ▶️
+
+                                </span>
+
+                                YouTube
+
                             </label>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <!-- UPLOAD -->
+
+                    <div
+                        class="video-source-box"
+                        id="uploadBox"
+                    >
+
+                        <label for="video_file">
+
+                            📤 Select a video
+
+                        </label>
+
+
+                        <input
+                            type="file"
+                            id="video_file"
+                            name="video_file"
+                            accept="video/*"
+                        >
+
+
+                        <div class="upload-info">
+
+                            Your uploaded video is temporary
+                            and will be deleted when the
+                            watch party ends.
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- YOUTUBE -->
+
+                    <div
+                        class="video-source-box"
+                        id="youtubeBox"
+                        style="display:none;"
+                    >
+
+                        <label for="youtube_url">
+
+                            🔗 YouTube URL
+
+                        </label>
+
+
+                        <input
+                            type="url"
+                            id="youtube_url"
+                            name="youtube_url"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                        >
+
+
+                        <div class="source-help">
+
+                            The YouTube video will be played
+                            through YouTube. Watch//Party will
+                            not download or store the video.
 
                         </div>
 
@@ -332,37 +752,154 @@
                 </div>
 
 
+                <!-- =================================
+                     ROOM TYPE
+                ================================= -->
+
+                <div class="form-group">
+
+                    <label>
+
+                        🔐 Room Type
+
+                    </label>
+
+
+                    <div class="room-types">
+
+
+                        <div class="room-type">
+
+                            <input
+                                type="radio"
+                                id="public"
+                                name="room_type"
+                                value="public"
+                                checked
+                            >
+
+
+                            <label for="public">
+
+                                🌐<br>
+
+                                Public
+
+                                <small>
+
+                                    Anyone can find and join
+
+                                </small>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="room-type">
+
+                            <input
+                                type="radio"
+                                id="private"
+                                name="room_type"
+                                value="private"
+                            >
+
+
+                            <label for="private">
+
+                                🔒<br>
+
+                                Private
+
+                                <small>
+
+                                    Join using room code
+
+                                </small>
+
+                            </label>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
+                     MAX PLAYERS
+                ================================= -->
+
                 <div class="form-group">
 
                     <label for="max_players">
+
                         👥 Maximum Players
+
                     </label>
 
-                    <select id="max_players" name="max_players">
 
-                        <option value="2">2 Players</option>
-                        <option value="4">4 Players</option>
-                        <option value="6">6 Players</option>
-                        <option value="8" selected>8 Players</option>
-                        <option value="10">10 Players</option>
-                        <option value="12">12 Players</option>
+                    <select
+                        id="max_players"
+                        name="max_players"
+                    >
+
+                        <option value="2">
+                            2 Players
+                        </option>
+
+                        <option value="4">
+                            4 Players
+                        </option>
+
+                        <option value="6">
+                            6 Players
+                        </option>
+
+                        <option value="8" selected>
+                            8 Players
+                        </option>
+
+                        <option value="10">
+                            10 Players
+                        </option>
+
+                        <option value="12">
+                            12 Players
+                        </option>
 
                     </select>
 
                 </div>
 
 
+                <!-- =================================
+                     THEME
+                ================================= -->
+
                 <div class="form-group">
 
                     <label>
+
                         🎨 Choose Room Theme
+
                     </label>
+
 
                     <div class="theme-grid">
 
+
                         <div class="theme-option">
 
-                            <input type="radio" id="arcade" name="theme" value="arcade" checked>
+                            <input
+                                type="radio"
+                                id="arcade"
+                                name="theme"
+                                value="arcade"
+                                checked
+                            >
 
                             <label for="arcade">
 
@@ -379,7 +916,12 @@
 
                         <div class="theme-option">
 
-                            <input type="radio" id="romantic" name="theme" value="romantic">
+                            <input
+                                type="radio"
+                                id="romantic"
+                                name="theme"
+                                value="romantic"
+                            >
 
                             <label for="romantic">
 
@@ -396,7 +938,12 @@
 
                         <div class="theme-option">
 
-                            <input type="radio" id="silly" name="theme" value="silly">
+                            <input
+                                type="radio"
+                                id="silly"
+                                name="theme"
+                                value="silly"
+                            >
 
                             <label for="silly">
 
@@ -413,7 +960,12 @@
 
                         <div class="theme-option">
 
-                            <input type="radio" id="action" name="theme" value="action">
+                            <input
+                                type="radio"
+                                id="action"
+                                name="theme"
+                                value="action"
+                            >
 
                             <label for="action">
 
@@ -430,7 +982,12 @@
 
                         <div class="theme-option">
 
-                            <input type="radio" id="horror" name="theme" value="horror">
+                            <input
+                                type="radio"
+                                id="horror"
+                                name="theme"
+                                value="horror"
+                            >
 
                             <label for="horror">
 
@@ -447,7 +1004,12 @@
 
                         <div class="theme-option">
 
-                            <input type="radio" id="space" name="theme" value="space">
+                            <input
+                                type="radio"
+                                id="space"
+                                name="theme"
+                                value="space"
+                            >
 
                             <label for="space">
 
@@ -461,39 +1023,189 @@
 
                         </div>
 
+
                     </div>
 
                 </div>
 
 
+                <!-- =================================
+                     CREATOR
+                ================================= -->
+
                 <div class="form-group">
 
                     <label for="creator">
+
                         👤 Your Name
+
                     </label>
 
-                    <input type="text" id="creator" name="creator" placeholder="Enter your display name" required>
+
+                    <input
+                        type="text"
+                        id="creator"
+                        name="creator"
+                        placeholder="Enter your display name"
+                        required
+                    >
 
                 </div>
 
 
-                <button type="submit" class="create-submit">
+                <button
+                    type="submit"
+                    class="create-submit"
+                >
+
                     CREATE WATCH PARTY →
+
                 </button>
+
 
             </form>
 
 
-            <a href="/" class="back-link">
+            <a
+                href="/"
+                class="back-link"
+            >
+
                 ← Back to home
+
             </a>
 
+
         </div>
+
 
     </main>
 
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+
+        const uploadSource =
+            document.getElementById(
+                "upload_source"
+            );
+
+        const youtubeSource =
+            document.getElementById(
+                "youtube_source"
+            );
+
+        const uploadBox =
+            document.getElementById(
+                "uploadBox"
+            );
+
+        const youtubeBox =
+            document.getElementById(
+                "youtubeBox"
+            );
+
+        const videoFile =
+            document.getElementById(
+                "video_file"
+            );
+
+        const youtubeUrl =
+            document.getElementById(
+                "youtube_url"
+            );
+
+
+        function updateVideoSource() {
+
+            if (uploadSource.checked) {
+
+                uploadBox.style.display =
+                    "block";
+
+                youtubeBox.style.display =
+                    "none";
+
+                videoFile.required = true;
+
+                youtubeUrl.required = false;
+
+            }
+
+            else {
+
+                uploadBox.style.display =
+                    "none";
+
+                youtubeBox.style.display =
+                    "block";
+
+                videoFile.required = false;
+
+                youtubeUrl.required = true;
+
+            }
+
+        }
+
+
+        uploadSource.addEventListener(
+            "change",
+            updateVideoSource
+        );
+
+
+        youtubeSource.addEventListener(
+            "change",
+            updateVideoSource
+        );
+
+
+        updateVideoSource();
+
+
+        document
+            .getElementById("createRoomForm")
+            .addEventListener(
+                "submit",
+                function(event) {
+
+                    if (
+                        uploadSource.checked &&
+                        !videoFile.files.length
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please choose a video to upload."
+                        );
+
+                    }
+
+
+                    if (
+                        youtubeSource.checked &&
+                        !youtubeUrl.value.trim()
+                    ) {
+
+                        event.preventDefault();
+
+                        alert(
+                            "Please enter a YouTube URL."
+                        );
+
+                    }
+
+                }
+            );
+
+    </script>
+
+
+    <script
+        src="{{ url_for('static', filename='js/main.js') }}"
+    ></script>
+
 
 </body>
 
