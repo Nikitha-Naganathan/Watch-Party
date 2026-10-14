@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Watch//Party</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="background">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <header class="navbar">
+
+        <div class="logo">
+            <span class="logo-icon">▶</span>
+            WATCH<span>//</span>PARTY
+        </div>
+
+        <div class="nav-right">
+
+            <button class="language-btn">
+                EN
+            </button>
+
+            <button id="themeToggle" class="theme-btn">
+                ☀
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="hero">
+
+        <div class="hero-content">
+
+            <div class="status">
+                <span class="status-dot"></span>
+                THE PARTY STARTS HERE
+            </div>
+
+            <h1>
+                Watch Together.<br>
+                <span>Anywhere.</span>
+            </h1>
+
+            <p>
+                Create a room, invite your friends and experience
+                movies together in real time.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="/create-room" class="primary-btn">
+                    CREATE ROOM
+                    <span>→</span>
+                </a>
+
+                <a href="/join-room" class="secondary-btn">
+                    JOIN ROOM
+                </a>
+
+            </div>
+
+            <div class="features">
+
+                <div class="feature">
+                    <span>🎬</span>
+                    <p>Synced Watching</p>
+                </div>
+
+                <div class="feature">
+                    <span>💬</span>
+                    <p>Live Chat</p>
+                </div>
+
+                <div class="feature">
+                    <span>🌐</span>
+                    <p>Switch Between Several Languages</p>
+                </div>
+
+                <div class="feature">
+                    <span>🎨</span>
+                    <p>Custom Themes</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            WATCH//PARTY
+            <span>•</span>
+            Watch. Chat. Connect.
+        </p>
+
+    </footer>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>

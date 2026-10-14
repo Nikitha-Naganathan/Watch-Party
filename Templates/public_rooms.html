@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Public Rooms | Watch//Party</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        .public-container {
+
+            width: min(1100px, 92%);
+
+            margin: 50px auto;
+
+        }
+
+        .public-header {
+
+            text-align: center;
+
+            margin-bottom: 45px;
+
+        }
+
+        .public-header h1 {
+
+            font-size: 50px;
+
+            letter-spacing: -2px;
+
+        }
+
+        .public-header p {
+
+            color: var(--muted);
+
+            margin-top: 15px;
+
+        }
+
+        .rooms-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(280px, 1fr));
+
+            gap: 20px;
+
+        }
+
+        .room-card {
+
+            padding: 25px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 16px;
+
+            background: var(--surface);
+
+            backdrop-filter: blur(15px);
+
+            transition: 0.3s;
+
+        }
+
+        .room-card:hover {
+
+            transform: translateY(-5px);
+
+            border-color: var(--purple);
+
+            box-shadow:
+                0 10px 35px rgba(168, 85, 247, 0.15);
+
+        }
+
+        .room-theme {
+
+            font-size: 35px;
+
+            margin-bottom: 15px;
+
+        }
+
+        .room-card h2 {
+
+            font-size: 20px;
+
+            margin-bottom: 10px;
+
+        }
+
+        .room-code-small {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            letter-spacing: 2px;
+
+        }
+
+        .room-info {
+
+            display: flex;
+
+            gap: 10px;
+
+            margin: 20px 0;
+
+            flex-wrap: wrap;
+
+        }
+
+        .room-info span {
+
+            padding: 7px 10px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 7px;
+
+            font-size: 12px;
+
+            color: var(--muted);
+
+        }
+
+        .room-full {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            background: rgba(239, 68, 68, 0.1);
+
+            border: 1px solid rgba(239, 68, 68, 0.25);
+
+            color: #f87171;
+
+        }
+
+        .join-public-form {
+
+            margin-top: 15px;
+
+        }
+
+        .name-input {
+
+            width: 100%;
+
+            padding: 12px;
+
+            margin-bottom: 10px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 8px;
+
+            background: rgba(0, 0, 0, 0.2);
+
+            color: var(--text);
+
+            outline: none;
+
+        }
+
+        .join-public-btn {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: linear-gradient(
+                90deg,
+                var(--purple),
+                var(--pink)
+            );
+
+            color: white;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+        .no-rooms {
+
+            text-align: center;
+
+            padding: 70px;
+
+            color: var(--muted);
+
+        }
+
+        .back-link {
+
+            display: block;
+
+            margin-top: 40px;
+
+            text-align: center;
+
+            color: var(--muted);
+
+            text-decoration: none;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="background">
+
+        <div class="orb orb-1"></div>
+
+        <div class="orb orb-2"></div>
+
+        <div class="orb orb-3"></div>
+
+    </div>
+
+
+    <header class="navbar">
+
+        <div class="logo">
+
+            <span class="logo-icon">▶</span>
+
+            WATCH<span>//</span>PARTY
+
+        </div>
+
+        <div class="nav-right">
+
+            <button id="themeToggle">
+                ☀
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="public-container">
+
+        <div class="public-header">
+
+            <h1>
+                Public Parties
+            </h1>
+
+            <p>
+                Find a party and start watching together.
+            </p>
+
+        </div>
+
+
+        {% if rooms %}
+
+        <div class="rooms-grid">
+
+            {% for item in rooms %}
+
+            {% set room = item["room"] %}
+
+            {% set count = item["count"] %}
+
+
+            <div class="room-card">
+
+                <div class="room-theme">
+
+                    {% if room["theme"] == "romantic" %}
+                    💕
+                    {% elif room["theme"] == "silly" %}
+                    😂
+                    {% elif room["theme"] == "action" %}
+                    💥
+                    {% elif room["theme"] == "horror" %}
+                    👻
+                    {% elif room["theme"] == "space" %}
+                    🚀
+                    {% else %}
+                    🕹️
+                    {% endif %}
+
+                </div>
+
+
+                <h2>
+                    {{ room["room_name"] }}
+                </h2>
+
+
+                <div class="room-code-small">
+
+                    CODE: {{ room["room_code"] }}
+
+                </div>
+
+
+                <div class="room-info">
+
+                    <span>
+                        👥 {{ count }}/{{ room["max_players"] }}
+                    </span>
+
+                    <span>
+                        🎨 {{ room["theme"]|capitalize }}
+                    </span>
+
+                </div>
+
+
+                {% if count >= room["max_players"] %}
+
+                    <div class="room-full">
+                        🔴 ROOM FULL
+                    </div>
+
+                {% else %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('join_public', room_code=room['room_code']) }}"
+                        class="join-public-form"
+                    >
+
+                        <input
+                            type="text"
+                            name="player_name"
+                            class="name-input"
+                            placeholder="Your name"
+                            required
+                        >
+
+                        <button
+                            type="submit"
+                            class="join-public-btn"
+                        >
+                            JOIN PARTY →
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="no-rooms">
+
+            <h2>
+                🎬 No public parties yet
+            </h2>
+
+            <p>
+                Be the first person to create one!
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        <a
+            href="/"
+            class="back-link"
+        >
+            ← Back to home
+        </a>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>

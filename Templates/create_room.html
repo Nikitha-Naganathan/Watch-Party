@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Room | Watch//Party</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .create-container {
+            width: min(700px, 92%);
+            margin: 50px auto;
+        }
+
+        .create-card {
+            padding: 40px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 0 40px rgba(168, 85, 247, 0.12);
+        }
+
+        .page-title {
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        .page-description {
+            color: var(--muted);
+            margin-bottom: 35px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text);
+
+            outline: none;
+
+            font-size: 15px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--cyan);
+
+            box-shadow:
+                0 0 15px rgba(34, 211, 238, 0.2);
+        }
+
+        .room-types {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .room-type {
+            position: relative;
+        }
+
+        .room-type input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .room-type label {
+            display: block;
+
+            padding: 18px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .room-type label:hover {
+            border-color: var(--purple);
+
+            transform: translateY(-2px);
+        }
+
+        .room-type input:checked+label {
+            border-color: var(--pink);
+
+            background: rgba(236, 72, 153, 0.1);
+
+            box-shadow:
+                0 0 20px rgba(236, 72, 153, 0.15);
+        }
+
+        .theme-grid {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 12px;
+        }
+
+        .theme-option {
+            position: relative;
+        }
+
+        .theme-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .theme-option label {
+            display: block;
+
+            padding: 20px 10px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .theme-option label:hover {
+            transform: translateY(-3px);
+        }
+
+        .theme-option input:checked+label {
+            border-color: var(--cyan);
+
+            box-shadow:
+                0 0 20px rgba(34, 211, 238, 0.2);
+        }
+
+        .theme-emoji {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .create-submit {
+            width: 100%;
+
+            padding: 16px;
+
+            margin-top: 10px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: linear-gradient(90deg,
+                    var(--purple),
+                    var(--pink));
+
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        .create-submit:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 0 30px rgba(236, 72, 153, 0.4);
+        }
+
+        .back-link {
+            display: block;
+
+            margin-top: 20px;
+
+            text-align: center;
+
+            color: var(--muted);
+
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--cyan);
+        }
+
+        @media (max-width: 600px) {
+
+            .create-card {
+                padding: 25px;
+            }
+
+            .room-types {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="background">
+
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+
+    </div>
+
+
+    <header class="navbar">
+
+        <div class="logo">
+            <span class="logo-icon">▶</span>
+            WATCH<span>//</span>PARTY
+        </div>
+
+        <div class="nav-right">
+
+            <button id="themeToggle">
+                ☀
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="create-container">
+
+        <div class="create-card">
+
+            <h1 class="page-title">
+                Create Room
+            </h1>
+
+            <p class="page-description">
+                Set up your watch party and invite your friends.
+            </p>
+
+
+            <form method="POST">
+
+
+                <div class="form-group">
+
+                    <label for="room_name">
+                        🎬 Room / Video Name
+                    </label>
+
+                    <input type="text" id="room_name" name="room_name" placeholder="Example: Avengers: Endgame"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        🔐 Room Type
+                    </label>
+
+                    <div class="room-types">
+
+                        <div class="room-type">
+
+                            <input type="radio" id="public" name="room_type" value="public" checked>
+
+                            <label for="public">
+                                🌐<br>
+                                Public
+                                <small>
+                                    Anyone can find and join
+                                </small>
+                            </label>
+
+                        </div>
+
+
+                        <div class="room-type">
+
+                            <input type="radio" id="private" name="room_type" value="private">
+
+                            <label for="private">
+                                🔒<br>
+                                Private
+                                <small>
+                                    Join using room code
+                                </small>
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="max_players">
+                        👥 Maximum Players
+                    </label>
+
+                    <select id="max_players" name="max_players">
+
+                        <option value="2">2 Players</option>
+                        <option value="4">4 Players</option>
+                        <option value="6">6 Players</option>
+                        <option value="8" selected>8 Players</option>
+                        <option value="10">10 Players</option>
+                        <option value="12">12 Players</option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        🎨 Choose Room Theme
+                    </label>
+
+                    <div class="theme-grid">
+
+                        <div class="theme-option">
+
+                            <input type="radio" id="arcade" name="theme" value="arcade" checked>
+
+                            <label for="arcade">
+
+                                <span class="theme-emoji">
+                                    🕹️
+                                </span>
+
+                                Arcade
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="theme-option">
+
+                            <input type="radio" id="romantic" name="theme" value="romantic">
+
+                            <label for="romantic">
+
+                                <span class="theme-emoji">
+                                    💕
+                                </span>
+
+                                Romantic
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="theme-option">
+
+                            <input type="radio" id="silly" name="theme" value="silly">
+
+                            <label for="silly">
+
+                                <span class="theme-emoji">
+                                    😂
+                                </span>
+
+                                Silly
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="theme-option">
+
+                            <input type="radio" id="action" name="theme" value="action">
+
+                            <label for="action">
+
+                                <span class="theme-emoji">
+                                    💥
+                                </span>
+
+                                Action
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="theme-option">
+
+                            <input type="radio" id="horror" name="theme" value="horror">
+
+                            <label for="horror">
+
+                                <span class="theme-emoji">
+                                    👻
+                                </span>
+
+                                Horror
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="theme-option">
+
+                            <input type="radio" id="space" name="theme" value="space">
+
+                            <label for="space">
+
+                                <span class="theme-emoji">
+                                    🚀
+                                </span>
+
+                                Space
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="creator">
+                        👤 Your Name
+                    </label>
+
+                    <input type="text" id="creator" name="creator" placeholder="Enter your display name" required>
+
+                </div>
+
+
+                <button type="submit" class="create-submit">
+                    CREATE WATCH PARTY →
+                </button>
+
+            </form>
+
+
+            <a href="/" class="back-link">
+                ← Back to home
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>

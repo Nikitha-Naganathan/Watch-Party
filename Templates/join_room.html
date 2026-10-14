@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Join Room | Watch//Party</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        .join-container {
+
+            min-height: calc(100vh - 80px);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 30px;
+
+        }
+
+        .join-card {
+
+            width: min(550px, 100%);
+
+            padding: 45px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 20px;
+
+            background: var(--surface);
+
+            backdrop-filter: blur(20px);
+
+            text-align: center;
+
+        }
+
+        .join-icon {
+
+            font-size: 55px;
+
+            margin-bottom: 15px;
+
+        }
+
+        .join-card h1 {
+
+            font-size: 40px;
+
+            letter-spacing: -2px;
+
+            margin-bottom: 10px;
+
+        }
+
+        .join-description {
+
+            color: var(--muted);
+
+            margin-bottom: 35px;
+
+        }
+
+        .form-group {
+
+            text-align: left;
+
+            margin-bottom: 20px;
+
+        }
+
+        .form-group label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+        }
+
+        .form-group input {
+
+            width: 100%;
+
+            padding: 15px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 10px;
+
+            background: rgba(0, 0, 0, 0.2);
+
+            color: var(--text);
+
+            font-size: 16px;
+
+            outline: none;
+
+        }
+
+        .form-group input:focus {
+
+            border-color: var(--cyan);
+
+            box-shadow:
+                0 0 15px rgba(34, 211, 238, 0.2);
+
+        }
+
+        .code-input {
+
+            text-align: center;
+
+            letter-spacing: 6px;
+
+            text-transform: uppercase;
+
+            font-size: 24px !important;
+
+            font-weight: bold;
+
+        }
+
+        .join-btn {
+
+            width: 100%;
+
+            padding: 16px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: linear-gradient(
+                90deg,
+                var(--purple),
+                var(--pink)
+            );
+
+            color: white;
+
+            font-weight: bold;
+
+            font-size: 15px;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+
+        }
+
+        .join-btn:hover {
+
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 0 30px rgba(236, 72, 153, 0.4);
+
+        }
+
+        .divider {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin: 30px 0;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+        .divider::before,
+        .divider::after {
+
+            content: "";
+
+            flex: 1;
+
+            height: 1px;
+
+            background: var(--border);
+
+        }
+
+        .public-btn {
+
+            display: block;
+
+            width: 100%;
+
+            padding: 15px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 10px;
+
+            color: var(--text);
+
+            text-decoration: none;
+
+            transition: 0.3s;
+
+        }
+
+        .public-btn:hover {
+
+            border-color: var(--cyan);
+
+            box-shadow:
+                0 0 20px rgba(34, 211, 238, 0.2);
+
+        }
+
+        .error {
+
+            margin-bottom: 20px;
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            background: rgba(239, 68, 68, 0.1);
+
+            border: 1px solid rgba(239, 68, 68, 0.3);
+
+            color: #f87171;
+
+            font-size: 14px;
+
+        }
+
+        .back-link {
+
+            display: block;
+
+            margin-top: 25px;
+
+            color: var(--muted);
+
+            text-decoration: none;
+
+        }
+
+        .back-link:hover {
+
+            color: var(--cyan);
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="background">
+
+        <div class="orb orb-1"></div>
+
+        <div class="orb orb-2"></div>
+
+        <div class="orb orb-3"></div>
+
+    </div>
+
+
+    <header class="navbar">
+
+        <div class="logo">
+
+            <span class="logo-icon">▶</span>
+
+            WATCH<span>//</span>PARTY
+
+        </div>
+
+        <div class="nav-right">
+
+            <button id="themeToggle">
+                ☀
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="join-container">
+
+        <div class="join-card">
+
+            <div class="join-icon">
+                🎮
+            </div>
+
+            <h1>
+                Join a Party
+            </h1>
+
+            <p class="join-description">
+                Enter a room code or discover a public watch party.
+            </p>
+
+
+            {% if error %}
+
+            <div class="error">
+                ⚠ {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            <form method="POST">
+
+                <div class="form-group">
+
+                    <label for="player_name">
+                        👤 Your Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="player_name"
+                        name="player_name"
+                        placeholder="Enter your display name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="room_code">
+                        🔑 Room Code
+                    </label>
+
+                    <input
+                        type="text"
+                        id="room_code"
+                        name="room_code"
+                        class="code-input"
+                        maxlength="6"
+                        placeholder="A7X9K2"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="join-btn"
+                >
+                    JOIN WATCH PARTY →
+                </button>
+
+            </form>
+
+
+            <div class="divider">
+                OR
+            </div>
+
+
+            <a
+                href="/public-rooms"
+                class="public-btn"
+            >
+                🌐 BROWSE PUBLIC ROOMS
+            </a>
+
+
+            <a
+                href="/"
+                class="back-link"
+            >
+                ← Back to home
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>

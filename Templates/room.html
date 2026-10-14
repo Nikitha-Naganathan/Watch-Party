@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ room["room_name"] }} | Watch//Party</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        .room-container {
+
+            width: 94%;
+
+            max-width: 1400px;
+
+            margin: 25px auto;
+
+        }
+
+        .room-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+
+        }
+
+        .room-title h1 {
+
+            font-size: 28px;
+
+            letter-spacing: -1px;
+
+        }
+
+        .room-code-display {
+
+            color: var(--cyan);
+
+            font-size: 13px;
+
+            letter-spacing: 2px;
+
+        }
+
+        .room-layout {
+
+            display: grid;
+
+            grid-template-columns: 1fr 320px;
+
+            gap: 20px;
+
+        }
+
+        .video-section {
+
+            aspect-ratio: 16 / 9;
+
+            background: #000;
+
+            border: 1px solid var(--border);
+
+            border-radius: 15px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+        .video-placeholder {
+
+            text-align: center;
+
+            color: var(--muted);
+
+        }
+
+        .video-placeholder span {
+
+            display: block;
+
+            font-size: 70px;
+
+            margin-bottom: 15px;
+
+        }
+
+        .sidebar {
+
+            border: 1px solid var(--border);
+
+            border-radius: 15px;
+
+            background: var(--surface);
+
+            overflow: hidden;
+
+        }
+
+        .sidebar-title {
+
+            padding: 18px;
+
+            border-bottom: 1px solid var(--border);
+
+            font-weight: bold;
+
+        }
+
+        .players {
+
+            padding: 10px;
+
+        }
+
+        .player {
+
+            padding: 12px;
+
+            margin-bottom: 5px;
+
+            border-radius: 8px;
+
+            background: rgba(255, 255, 255, 0.03);
+
+        }
+
+        .online {
+
+            display: inline-block;
+
+            width: 7px;
+
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #22c55e;
+
+            margin-right: 8px;
+
+        }
+
+        @media (max-width: 800px) {
+
+            .room-layout {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="background">
+
+        <div class="orb orb-1"></div>
+
+        <div class="orb orb-2"></div>
+
+        <div class="orb orb-3"></div>
+
+    </div>
+
+
+    <header class="navbar">
+
+        <div class="logo">
+
+            <span class="logo-icon">▶</span>
+
+            WATCH<span>//</span>PARTY
+
+        </div>
+
+        <div class="nav-right">
+
+            <button id="themeToggle">
+                ☀
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main class="room-container">
+
+
+        <div class="room-header">
+
+            <div class="room-title">
+
+                <h1>
+                    {{ room["room_name"] }}
+                </h1>
+
+            <div class="room-code-display">
+
+                ROOM CODE:
+                {{ room["room_code"] }}
+
+            </div>
+
+        </div>
+        
+        <a
+            href="{{ url_for('quit_room', room_code=room['room_code']) }}"
+            class="quit-room-btn"
+        >
+
+            🚪 QUIT ROOM
+
+        </a>
+
+    </div>
+
+
+        <div class="room-layout">
+
+
+            <section class="video-section">
+
+                <div class="video-placeholder">
+
+                    <span>🎬</span>
+
+                    <p>
+                        Video player coming next
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <aside class="sidebar">
+
+                <div class="sidebar-title">
+
+                    👥 Players
+
+                    ({{ participants|length }}/{{ room["max_players"] }})
+
+                </div>
+
+
+                <div class="players">
+
+                    {% for participant in participants %}
+
+                    <div class="player">
+
+                        <span class="online"></span>
+
+                        {{ participant["player_name"] }}
+
+                        {% if participant["player_name"] == room["creator"] %}
+
+                        <small>
+                            👑 HOST
+                        </small>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </aside>
+
+
+        </div>
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>
