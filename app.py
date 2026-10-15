@@ -1550,6 +1550,8 @@ def quit_room(room_code):
             player_id=player_id
         )
     )
+
+
 # =========================================================
 # DELETE ROOM
 # =========================================================
@@ -1773,7 +1775,6 @@ def leave_room_route(room_code):
 
     if new_host is not None:
 
-        # Remove old host
         connection.execute(
             """
             DELETE FROM participants
@@ -1788,7 +1789,6 @@ def leave_room_route(room_code):
             )
         )
 
-        # Transfer host
         connection.execute(
             """
             UPDATE rooms
@@ -1809,10 +1809,6 @@ def leave_room_route(room_code):
         connection.commit()
 
         connection.close()
-
-        # -------------------------------------------------
-        # NOTIFY EVERYONE STILL IN THE ROOM
-        # -------------------------------------------------
 
         socketio.emit(
             "member_left",
@@ -1842,9 +1838,6 @@ def leave_room_route(room_code):
             to=room_code
         )
 
-        # Send the NEW room state.
-        # This is important because creator_player_id
-        # has now changed.
         broadcast_room_update(
             room_code
         )
@@ -1896,15 +1889,13 @@ def leave_room_route(room_code):
             to=room_code
         )
 
-    # -----------------------------------------------------
-    # CLEAR HOST SESSION
-    # -----------------------------------------------------
-
     session.clear()
 
     return redirect(
         url_for("home")
     )
+
+
 # =========================================================
 # NORMAL MEMBER LEAVES
 # =========================================================
@@ -1970,7 +1961,6 @@ def leave_member(room_code):
 
         return redirect(url_for("home"))
 
-    # Host must use host leave route.
     if player_id == room["creator_player_id"]:
 
         connection.close()
@@ -2401,6 +2391,512 @@ def handle_chat_message(data):
         },
         to=room_code
     )
+
+
+# =========================================================
+# WEBRTC CALL HELPERS
+# =========================================================
+
+def get_call_room(room_code):
+
+    return "call_" + room_code
+
+
+def is_valid_call_participant(
+    room_code,
+    player_id
+):
+
+    if not room_code or not player_id:
+        return False
+
+    connection = get_db()
+
+    participant = connection.execute(
+        """
+        SELECT player_id
+
+        FROM participants
+
+        WHERE room_code = ?
+
+        AND player_id = ?
+        """,
+        (
+            room_code,
+            player_id
+        )
+    ).fetchone()
+
+    room = connection.execute(
+        """
+        SELECT room_code
+
+        FROM rooms
+
+        WHERE room_code = ?
+
+        AND active = 1
+        """,
+        (room_code,)
+    ).fetchone()
+
+    connection.close()
+
+    return (
+        participant is not None
+        and room is not None
+    )
+
+
+def get_call_members(room_code):
+
+    call_room = get_call_room(room_code)
+
+    try:
+
+        members = socketio.server.manager.get_participants(
+            "/",
+            call_room
+        )
+
+        return list(members)
+
+    except Exception:
+
+        return []
+
+
+def get_call_socket_ids(room_code, exclude_socket_id=None):
+
+    socket_ids = []
+
+    for sid, _ in get_call_members(room_code):
+
+        if sid == exclude_socket_id:
+            continue
+
+        socket_ids.append(sid)
+
+    return socket_ids
+
+
+# =========================================================
+# WEBRTC CALL SIGNALING - JOIN
+# =========================================================
+
+@socketio.on("call_join")
+def handle_call_join(data):
+
+    room_code = data.get(
+        "room_code"
+    )
+
+    player_id = (
+        data.get("player_id")
+        or session.get("player_id")
+    )
+
+    if not room_code or not player_id:
+        return
+
+    connection = get_db()
+
+    participant = connection.execute(
+        """
+        SELECT
+            player_name,
+            player_id
+
+        FROM participants
+
+        WHERE room_code = ?
+
+        AND player_id = ?
+        """,
+        (
+            room_code,
+            player_id
+        )
+    ).fetchone()
+
+    room = connection.execute(
+        """
+        SELECT room_code
+
+        FROM rooms
+
+        WHERE room_code = ?
+
+        AND active = 1
+        """,
+        (room_code,)
+    ).fetchone()
+
+    connection.close()
+
+    if participant is None or room is None:
+        return
+
+    call_room = get_call_room(
+        room_code
+    )
+
+    # -----------------------------------------------------
+    # GET USERS WHO ARE ALREADY IN THE CALL
+    # -----------------------------------------------------
+
+    existing_call_participants = []
+
+    for sid, _ in get_call_members(room_code):
+
+        if sid == request.sid:
+            continue
+
+        existing_call_participants.append(
+            {
+                "socket_id": sid
+            }
+        )
+
+    # -----------------------------------------------------
+    # JOIN CALL ROOM FIRST
+    # -----------------------------------------------------
+
+    join_room(
+        call_room
+    )
+
+    # -----------------------------------------------------
+    # SEND EXISTING USERS TO THE NEW PARTICIPANT
+    #
+    # The NEW participant creates the offers.
+    # This gives every pair one clear offerer and avoids
+    # two browsers creating competing offers at the same time.
+    # -----------------------------------------------------
+
+    emit(
+        "call_existing_users",
+        {
+            "participants":
+                existing_call_participants
+        }
+    )
+
+    # -----------------------------------------------------
+    # TELL EXISTING PARTICIPANTS ABOUT THE NEW USER
+    # -----------------------------------------------------
+
+    socketio.emit(
+        "call_user_joined",
+        {
+            "socket_id":
+                request.sid,
+
+            "player_id":
+                participant["player_id"],
+
+            "player_name":
+                participant["player_name"]
+        },
+        to=call_room,
+        include_self=False
+    )
+
+    # -----------------------------------------------------
+    # SEND UPDATED CALL COUNT
+    # -----------------------------------------------------
+
+    socketio.emit(
+        "call_participant_count",
+        {
+            "count":
+                len(get_call_members(room_code))
+        },
+        to=call_room
+    )
+
+
+# =========================================================
+# WEBRTC OFFER
+# =========================================================
+
+@socketio.on("webrtc_offer")
+def handle_webrtc_offer(data):
+
+    target_socket_id = data.get(
+        "target_socket_id"
+    )
+
+    offer = data.get(
+        "offer"
+    )
+
+    room_code = data.get(
+        "room_code"
+    )
+
+    player_id = (
+        data.get("player_id")
+        or session.get("player_id")
+    )
+
+    if (
+        not target_socket_id
+        or not offer
+        or not room_code
+        or not player_id
+    ):
+        return
+
+    if not is_valid_call_participant(
+        room_code,
+        player_id
+    ):
+        return
+
+    if target_socket_id not in get_call_socket_ids(room_code):
+        return
+
+    emit(
+        "webrtc_offer",
+        {
+            "offer": offer,
+
+            "sender_socket_id":
+                request.sid
+        },
+        to=target_socket_id
+    )
+
+
+# =========================================================
+# WEBRTC ANSWER
+# =========================================================
+
+@socketio.on("webrtc_answer")
+def handle_webrtc_answer(data):
+
+    target_socket_id = data.get(
+        "target_socket_id"
+    )
+
+    answer = data.get(
+        "answer"
+    )
+
+    room_code = data.get(
+        "room_code"
+    )
+
+    player_id = (
+        data.get("player_id")
+        or session.get("player_id")
+    )
+
+    if (
+        not target_socket_id
+        or not answer
+        or not room_code
+        or not player_id
+    ):
+        return
+
+    if not is_valid_call_participant(
+        room_code,
+        player_id
+    ):
+        return
+
+    if target_socket_id not in get_call_socket_ids(room_code):
+        return
+
+    emit(
+        "webrtc_answer",
+        {
+            "answer": answer,
+
+            "sender_socket_id":
+                request.sid
+        },
+        to=target_socket_id
+    )
+
+
+# =========================================================
+# WEBRTC ICE CANDIDATE
+# =========================================================
+
+@socketio.on("webrtc_ice_candidate")
+def handle_webrtc_ice_candidate(data):
+
+    target_socket_id = data.get(
+        "target_socket_id"
+    )
+
+    candidate = data.get(
+        "candidate"
+    )
+
+    room_code = data.get(
+        "room_code"
+    )
+
+    player_id = (
+        data.get("player_id")
+        or session.get("player_id")
+    )
+
+    if (
+        not target_socket_id
+        or not candidate
+        or not room_code
+        or not player_id
+    ):
+        return
+
+    if not is_valid_call_participant(
+        room_code,
+        player_id
+    ):
+        return
+
+    if target_socket_id not in get_call_socket_ids(room_code):
+        return
+
+    emit(
+        "webrtc_ice_candidate",
+        {
+            "candidate": candidate,
+
+            "sender_socket_id":
+                request.sid
+        },
+        to=target_socket_id
+    )
+
+
+# =========================================================
+# CALL LEAVE
+# =========================================================
+
+@socketio.on("call_leave")
+def handle_call_leave(data):
+
+    room_code = data.get(
+        "room_code"
+    )
+
+    player_id = (
+        data.get("player_id")
+        or session.get("player_id")
+    )
+
+    if not room_code or not player_id:
+        return
+
+    if not is_valid_call_participant(
+        room_code,
+        player_id
+    ):
+        return
+
+    call_room = get_call_room(
+        room_code
+    )
+
+    # Notify everyone else before removing the socket.
+    emit(
+        "call_user_left",
+        {
+            "socket_id":
+                request.sid,
+
+            "player_id":
+                player_id
+        },
+        to=call_room,
+        include_self=False
+    )
+
+    leave_room(
+        call_room
+    )
+
+    remaining_count = len(
+        get_call_members(room_code)
+    )
+
+    socketio.emit(
+        "call_participant_count",
+        {
+            "count":
+                remaining_count
+        },
+        to=call_room
+    )
+
+
+# =========================================================
+# SOCKET DISCONNECT
+# =========================================================
+
+@socketio.on("disconnect")
+def handle_disconnect():
+
+    # If the browser closes/reloads while the user is in
+    # the call, remove that peer from every call room.
+    try:
+
+        joined_rooms = list(
+            socketio.server.manager.get_rooms(
+                "/",
+                request.sid
+            )
+        )
+
+    except Exception:
+
+        joined_rooms = []
+
+    for room_name in joined_rooms:
+
+        if not room_name.startswith("call_"):
+            continue
+
+        socketio.emit(
+            "call_user_left",
+            {
+                "socket_id":
+                    request.sid
+            },
+            to=room_name,
+            include_self=False
+        )
+
+        try:
+
+            remaining_members = socketio.server.manager.get_participants(
+                "/",
+                room_name
+            )
+
+            remaining_count = len(
+                list(remaining_members)
+            )
+
+        except Exception:
+
+            remaining_count = 0
+
+        socketio.emit(
+            "call_participant_count",
+            {
+                "count":
+                    remaining_count
+            },
+            to=room_name
+        )
 
 
 # =========================================================

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +6,8 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>
         {{ room["room_name"] }} | Watch//Party
@@ -446,6 +448,156 @@
 
 
         /* =========================================
+           CALL
+        ========================================= */
+
+        .call-section {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+        }
+
+        .call-section h3 {
+            margin: 0 0 12px 0;
+        }
+
+        .call-status {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .join-call-btn {
+            width: 100%;
+            padding: 11px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            background: var(--cyan);
+            color: #000;
+        }
+
+        .join-call-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .join-call-btn.leave {
+            background: #ef4444;
+            color: white;
+        }
+
+        .call-controls {
+            display: none;
+            gap: 7px;
+            margin-top: 10px;
+        }
+
+        .call-controls.active {
+            display: flex;
+        }
+
+        .call-control-btn {
+            flex: 1;
+            padding: 9px 5px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .call-control-btn:hover {
+            border-color: var(--cyan);
+        }
+
+        .call-control-btn.active-off {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+        }
+
+
+        /* =========================================
+           CALL VIDEO GRID
+        ========================================= */
+
+        .call-video-grid {
+            display: none;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 7px;
+            margin-top: 12px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .call-video-grid.active {
+            display: grid;
+        }
+
+        .call-video-tile {
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16 / 10;
+            border: 1px solid var(--border);
+        }
+
+        .call-video-tile video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .call-video-name {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            padding: 4px 6px;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+        }
+
+        .call-video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+
+        /* =========================================
+           CALL ERROR
+        ========================================= */
+
+        .call-error {
+            display: none;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 7px;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .call-error.show {
+            display: block;
+        }
+
+
+        /* =========================================
            RESPONSIVE
         ========================================= */
 
@@ -515,9 +667,7 @@
 
     <main class="room-container">
 
-        <!-- =====================================
-             ROOM HEADER
-        ===================================== -->
+        <!-- ROOM HEADER -->
 
         <div class="room-header">
 
@@ -534,7 +684,8 @@
 
                 </div>
 
-                <div class="source-label" id="videoSourceLabel">
+                <div class="source-label"
+                     id="videoSourceLabel">
 
                     {% if room["video_type"] == "youtube" %}
 
@@ -565,9 +716,7 @@
         </div>
 
 
-        <!-- =====================================
-             ROOM LAYOUT
-        ===================================== -->
+        <!-- ROOM LAYOUT -->
 
         <div class="room-layout">
 
@@ -671,11 +820,12 @@
             </section>
 
 
-            <!-- =====================================
+            <!-- =================================
                  SIDEBAR
-            ===================================== -->
+            ================================= -->
 
             <aside class="sidebar">
+
 
                 <!-- PLAYERS -->
 
@@ -771,6 +921,79 @@
 
 
                 <!-- =================================
+                     PARTY CALL
+                ================================= -->
+
+                <div class="call-section">
+
+                    <h3>
+                        📞 Party Call
+                    </h3>
+
+
+                    <div class="call-status"
+                         id="callStatus">
+
+                        Not connected to call
+
+                    </div>
+
+
+                    <!-- VIDEO GRID -->
+
+                    <div class="call-video-grid"
+                         id="callVideoGrid">
+
+                    </div>
+
+
+                    <!-- JOIN / LEAVE -->
+
+                    <button type="button"
+                            class="join-call-btn"
+                            id="joinCallButton">
+
+                        📞 JOIN CALL
+
+                    </button>
+
+
+                    <!-- CALL CONTROLS -->
+
+                    <div class="call-controls"
+                         id="callControls">
+
+                        <button type="button"
+                                class="call-control-btn"
+                                id="muteButton">
+
+                            🎙️ MUTE
+
+                        </button>
+
+
+                        <button type="button"
+                                class="call-control-btn"
+                                id="cameraButton">
+
+                            📹 CAMERA OFF
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- CALL ERROR -->
+
+                    <div class="call-error"
+                         id="callError">
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================
                      HOST CONTROLS
                 ================================= -->
 
@@ -781,6 +1004,7 @@
                     <h3>
                         🎬 Host Controls
                     </h3>
+
 
                     <button type="button"
                             class="change-video-btn"
@@ -797,6 +1021,7 @@
                         <form method="POST"
                               action="{{ url_for('change_video', room_code=room['room_code']) }}"
                               enctype="multipart/form-data">
+
 
                             <input type="hidden"
                                    name="player_id"
@@ -911,19 +1136,34 @@
         const maxPlayers =
             {{ room["max_players"] }};
 
+
         let isHost =
             playerId ===
             "{{ room['creator_player_id'] }}";
 
-        let applyingRemoteUpdate = false;
 
-        let youtubeReady = false;
+        let applyingRemoteUpdate =
+            false;
 
-        let youtubePlayer = null;
 
-        let youtubeVideoId = null;
+        let youtubeReady =
+            false;
 
-        let lastRemoteTime = 0;
+
+        let youtubePlayer =
+            null;
+
+
+        let youtubeVideoId =
+            null;
+
+
+        let lastRemoteTime =
+            0;
+
+
+        let hostTransferReloadScheduled =
+            false;
 
 
         /* =========================================
@@ -935,20 +1175,24 @@
                 "videoPlayer"
             );
 
+
         const youtubeContainer =
             document.getElementById(
                 "youtubePlayer"
             );
+
 
         const syncStatus =
             document.getElementById(
                 "syncStatus"
             );
 
+
         const enablePlayback =
             document.getElementById(
                 "enablePlayback"
             );
+
 
         const enablePlaybackButton =
             document.getElementById(
@@ -965,10 +1209,12 @@
                 "chatForm"
             );
 
+
         const chatInput =
             document.getElementById(
                 "chatInput"
             );
+
 
         const chatMessages =
             document.getElementById(
@@ -1010,20 +1256,25 @@
                 return;
             }
 
+
             const systemMessage =
                 document.createElement(
                     "div"
                 );
 
+
             systemMessage.className =
                 "system-message";
+
 
             systemMessage.textContent =
                 message;
 
+
             chatMessages.appendChild(
                 systemMessage
             );
+
 
             scrollChatToBottom();
 
@@ -1036,10 +1287,12 @@
                 return;
             }
 
+
             const messageElement =
                 document.createElement(
                     "div"
                 );
+
 
             messageElement.className =
                 "chat-message";
@@ -1062,8 +1315,10 @@
                     "div"
                 );
 
+
             nameElement.className =
                 "chat-name";
+
 
             nameElement.textContent =
                 data.player_name;
@@ -1074,8 +1329,10 @@
                     "div"
                 );
 
+
             textElement.className =
                 "chat-text";
+
 
             textElement.textContent =
                 data.message;
@@ -1085,13 +1342,16 @@
                 nameElement
             );
 
+
             messageElement.appendChild(
                 textElement
             );
 
+
             chatMessages.appendChild(
                 messageElement
             );
+
 
             scrollChatToBottom();
 
@@ -1099,7 +1359,7 @@
 
 
         /* =========================================
-           SEND CHAT MESSAGE
+           SEND CHAT
         ========================================= */
 
         if (chatForm) {
@@ -1109,6 +1369,7 @@
                 function (event) {
 
                     event.preventDefault();
+
 
                     const message =
                         chatInput.value.trim();
@@ -1147,7 +1408,7 @@
 
 
         /* =========================================
-           RECEIVE CHAT MESSAGE
+           RECEIVE CHAT
         ========================================= */
 
         socket.on(
@@ -1172,8 +1433,11 @@
                     data.player_id ===
                     playerId
                 ) {
+
                     return;
+
                 }
+
 
                 addSystemMessage(
                     data.player_name +
@@ -1196,8 +1460,11 @@
                     data.player_id ===
                     playerId
                 ) {
+
                     return;
+
                 }
+
 
                 addSystemMessage(
                     data.player_name +
@@ -1209,7 +1476,7 @@
 
 
         /* =========================================
-           HOST TRANSFERRED
+           HOST CHANGED
         ========================================= */
 
         socket.on(
@@ -1217,12 +1484,16 @@
             function (data) {
 
                 const newHostName =
-                    data.player_name ||
+                    data.new_host_name ||
                     "Another player";
 
 
+                const newHostId =
+                    data.new_host_id;
+
+
                 if (
-                    data.player_id ===
+                    newHostId ===
                     playerId
                 ) {
 
@@ -1231,6 +1502,7 @@
                     );
 
                 }
+
                 else {
 
                     addSystemMessage(
@@ -1257,8 +1529,11 @@
                     data.player_id ===
                     playerId
                 ) {
+
                     return;
+
                 }
+
 
                 addSystemMessage(
                     "👑 The previous host, " +
@@ -1280,12 +1555,15 @@
                 return;
             }
 
+
             syncStatus.textContent =
                 message;
+
 
             syncStatus.classList.add(
                 "show"
             );
+
 
             setTimeout(
                 function () {
@@ -1373,6 +1651,7 @@
                     "playersList"
                 );
 
+
             const playerCount =
                 document.getElementById(
                     "playerCount"
@@ -1407,8 +1686,10 @@
                             "div"
                         );
 
+
                     player.className =
                         "player";
+
 
                     player.dataset.playerId =
                         participant.player_id;
@@ -1418,6 +1699,7 @@
                         document.createElement(
                             "span"
                         );
+
 
                     online.className =
                         "online";
@@ -1449,11 +1731,14 @@
                                 "span"
                             );
 
+
                         hostBadge.className =
                             "host-badge";
 
+
                         hostBadge.textContent =
                             "👑 HOST";
+
 
                         player.appendChild(
                             hostBadge
@@ -1499,14 +1784,24 @@
 
             if (hostChanged) {
 
-                setTimeout(
-                    function () {
+                if (
+                    !hostTransferReloadScheduled
+                ) {
 
-                        window.location.reload();
+                    hostTransferReloadScheduled =
+                        true;
 
-                    },
-                    200
-                );
+
+                    setTimeout(
+                        function () {
+
+                            window.location.reload();
+
+                        },
+                        500
+                    );
+
+                }
 
                 return;
 
@@ -1518,7 +1813,18 @@
                 !existingControls
             ) {
 
-                window.location.reload();
+                if (
+                    !hostTransferReloadScheduled
+                ) {
+
+                    hostTransferReloadScheduled =
+                        true;
+
+                    window.location.reload();
+
+                }
+
+                return;
 
             }
 
@@ -1528,7 +1834,16 @@
                 existingControls
             ) {
 
-                window.location.reload();
+                if (
+                    !hostTransferReloadScheduled
+                ) {
+
+                    hostTransferReloadScheduled =
+                        true;
+
+                    window.location.reload();
+
+                }
 
             }
 
@@ -1545,6 +1860,7 @@
                 document.getElementById(
                     "currentVideoName"
                 );
+
 
             const sourceLabel =
                 document.getElementById(
@@ -1572,6 +1888,7 @@
                         "YouTube";
 
                 }
+
                 else if (
                     state.video_type ===
                     "upload"
@@ -1581,6 +1898,7 @@
                         "Uploaded Video";
 
                 }
+
                 else {
 
                     sourceLabel.textContent =
@@ -1594,31 +1912,48 @@
 
 
         /* =========================================
-           YOUTUBE API READY
+           YOUTUBE API
         ========================================= */
 
         function onYouTubeIframeAPIReady() {
-
-            if (!youtubeContainer) {
-                return;
-            }
-
-            if (!youtubeVideoId) {
-                return;
-            }
 
             createYouTubePlayer();
 
         }
 
 
-        /* =========================================
-           CREATE YOUTUBE PLAYER
-        ========================================= */
-
         function createYouTubePlayer() {
 
-            if (!window.YT) {
+            if (!youtubeContainer) {
+                return;
+            }
+
+
+            if (!youtubeVideoId) {
+                return;
+            }
+
+
+            if (
+                !window.YT ||
+                !window.YT.Player
+            ) {
+
+                setTimeout(
+                    function () {
+
+                        createYouTubePlayer();
+
+                    },
+                    500
+                );
+
+                return;
+
+            }
+
+
+            if (youtubePlayer) {
                 return;
             }
 
@@ -1664,13 +1999,11 @@
         }
 
 
-        /* =========================================
-           YOUTUBE READY
-        ========================================= */
-
         function handleYouTubeReady(event) {
 
-            youtubeReady = true;
+            youtubeReady =
+                true;
+
 
             console.log(
                 "YouTube player ready."
@@ -1680,7 +2013,7 @@
 
 
         /* =========================================
-           YOUTUBE STATE CHANGE
+           YOUTUBE STATE
         ========================================= */
 
         function handleYouTubeStateChange(event) {
@@ -1754,10 +2087,6 @@
         }
 
 
-        /* =========================================
-           YOUTUBE ERROR
-        ========================================= */
-
         function handleYouTubeError(event) {
 
             console.log(
@@ -1781,6 +2110,7 @@
                     if (!isHost) {
                         return;
                     }
+
 
                     if (applyingRemoteUpdate) {
                         return;
@@ -1815,6 +2145,7 @@
                         return;
                     }
 
+
                     if (applyingRemoteUpdate) {
                         return;
                     }
@@ -1847,6 +2178,7 @@
                     if (!isHost) {
                         return;
                     }
+
 
                     if (applyingRemoteUpdate) {
                         return;
@@ -1888,7 +2220,8 @@
                 }
 
 
-                applyingRemoteUpdate = true;
+                applyingRemoteUpdate =
+                    true;
 
 
                 const time =
@@ -1919,7 +2252,9 @@
                             .then(
                                 function () {
 
-                                    if (enablePlayback) {
+                                    if (
+                                        enablePlayback
+                                    ) {
 
                                         enablePlayback.classList.remove(
                                             "show"
@@ -1932,7 +2267,9 @@
                             .catch(
                                 function () {
 
-                                    if (enablePlayback) {
+                                    if (
+                                        enablePlayback
+                                    ) {
 
                                         enablePlayback.classList.add(
                                             "show"
@@ -1959,6 +2296,7 @@
                             );
 
                     }
+
                     else {
 
                         setTimeout(
@@ -1973,7 +2311,9 @@
 
                     }
 
+
                     return;
+
                 }
 
 
@@ -1986,6 +2326,7 @@
                         time,
                         true
                     );
+
 
                     youtubePlayer.playVideo();
 
@@ -2026,7 +2367,8 @@
                 }
 
 
-                applyingRemoteUpdate = true;
+                applyingRemoteUpdate =
+                    true;
 
 
                 const time =
@@ -2043,6 +2385,7 @@
 
                     videoPlayer.currentTime =
                         time;
+
 
                     videoPlayer.pause();
 
@@ -2072,6 +2415,7 @@
                         time,
                         true
                     );
+
 
                     youtubePlayer.pauseVideo();
 
@@ -2112,7 +2456,8 @@
                 }
 
 
-                applyingRemoteUpdate = true;
+                applyingRemoteUpdate =
+                    true;
 
 
                 const time =
@@ -2191,7 +2536,6 @@
                 "click",
                 function () {
 
-
                     if (
                         youtubePlayer &&
                         youtubeReady &&
@@ -2264,7 +2608,7 @@
 
 
         /* =========================================
-           CHANGE VIDEO PANEL
+           CHANGE VIDEO
         ========================================= */
 
         const changeButton =
@@ -2272,10 +2616,12 @@
                 "changeVideoButton"
             );
 
+
         const changePanel =
             document.getElementById(
                 "changeVideoPanel"
             );
+
 
         const cancelButton =
             document.getElementById(
@@ -2324,10 +2670,12 @@
                 "uploadInput"
             );
 
+
         const youtubeInput =
             document.getElementById(
                 "youtubeInput"
             );
+
 
         const videoType =
             document.getElementById(
@@ -2431,17 +2779,1389 @@
 
 
         /* =========================================
-           LEAVE SOCKET ROOM
+           WEBRTC VIDEO / VOICE CALL
+        ========================================= */
+
+        const peerConnections = {};
+
+        const peerNames = {};
+
+        const pendingIceCandidates = {};
+
+        let localStream = null;
+
+        let inCall = false;
+
+        let microphoneEnabled = true;
+
+        let cameraEnabled = true;
+
+
+        const joinCallButton =
+            document.getElementById(
+                "joinCallButton"
+            );
+
+
+        const callControls =
+            document.getElementById(
+                "callControls"
+            );
+
+
+        const callVideoGrid =
+            document.getElementById(
+                "callVideoGrid"
+            );
+
+
+        const callStatus =
+            document.getElementById(
+                "callStatus"
+            );
+
+
+        const muteButton =
+            document.getElementById(
+                "muteButton"
+            );
+
+
+        const cameraButton =
+            document.getElementById(
+                "cameraButton"
+            );
+
+
+        const callError =
+            document.getElementById(
+                "callError"
+            );
+
+
+        /* =========================================
+           STUN
+        ========================================= */
+
+        const rtcConfiguration = {
+
+            iceServers: [
+
+                {
+                    urls:
+                        "stun:stun.l.google.com:19302"
+                }
+
+            ]
+
+        };
+
+
+        /* =========================================
+           CALL ERROR
+        ========================================= */
+
+        function showCallError(message) {
+
+            if (!callError) {
+                return;
+            }
+
+            callError.textContent =
+                message;
+
+            callError.classList.add(
+                "show"
+            );
+
+        }
+
+
+        function clearCallError() {
+
+            if (!callError) {
+                return;
+            }
+
+            callError.textContent =
+                "";
+
+            callError.classList.remove(
+                "show"
+            );
+
+        }
+
+
+        /* =========================================
+           CALL STATUS
+        ========================================= */
+
+        function setCallStatus(message) {
+
+            if (!callStatus) {
+                return;
+            }
+
+            callStatus.textContent =
+                message;
+
+        }
+
+
+        /* =========================================
+           CREATE VIDEO TILE
+        ========================================= */
+
+        function createCallVideoTile(
+            id,
+            name,
+            stream,
+            isLocal
+        ) {
+
+            if (!callVideoGrid) {
+                return null;
+            }
+
+            const existing =
+                document.getElementById(
+                    "call-tile-" + id
+                );
+
+            if (existing) {
+
+                const existingVideo =
+                    existing.querySelector(
+                        "video"
+                    );
+
+                if (
+                    existingVideo &&
+                    stream &&
+                    existingVideo.srcObject !== stream
+                ) {
+                    existingVideo.srcObject =
+                        stream;
+                }
+
+                return existing;
+
+            }
+
+            const tile =
+                document.createElement(
+                    "div"
+                );
+
+            tile.className =
+                "call-video-tile";
+
+            tile.id =
+                "call-tile-" + id;
+
+            const video =
+                document.createElement(
+                    "video"
+                );
+
+            video.autoplay = true;
+
+            video.playsInline = true;
+
+            /* Only the local preview is muted.
+             * Remote videos MUST NOT be muted because
+             * their audio tracks carry the other users' voices.
+             */
+            video.muted = !!isLocal;
+
+            if (stream) {
+                video.srcObject =
+                    stream;
+            }
+
+            video.addEventListener(
+                "loadedmetadata",
+                function () {
+                    const playPromise =
+                        video.play();
+
+                    if (playPromise) {
+                        playPromise.catch(
+                            function (error) {
+                                console.log(
+                                    "Remote call media autoplay was blocked:",
+                                    error
+                                );
+                            }
+                        );
+                    }
+                }
+            );
+
+            const nameLabel =
+                document.createElement(
+                    "div"
+                );
+
+            nameLabel.className =
+                "call-video-name";
+
+            nameLabel.textContent =
+                isLocal
+                    ? "You"
+                    : name;
+
+            tile.appendChild(
+                video
+            );
+
+            tile.appendChild(
+                nameLabel
+            );
+
+            callVideoGrid.appendChild(
+                tile
+            );
+
+            return tile;
+
+        }
+
+
+        /* =========================================
+           REMOVE VIDEO TILE
+        ========================================= */
+
+        function removeCallVideoTile(id) {
+
+            const tile =
+                document.getElementById(
+                    "call-tile-" + id
+                );
+
+            if (tile) {
+                tile.remove();
+            }
+
+        }
+
+
+        /* =========================================
+           PLAYER NAME
+        ========================================= */
+
+        function getPlayerName(remoteSocketId) {
+
+            if (peerNames[remoteSocketId]) {
+                return peerNames[remoteSocketId];
+            }
+
+            return "Participant";
+
+        }
+
+
+        /* =========================================
+           QUEUE ICE CANDIDATE
+        ========================================= */
+
+        function queueIceCandidate(
+            remoteSocketId,
+            candidate
+        ) {
+
+            if (!pendingIceCandidates[remoteSocketId]) {
+                pendingIceCandidates[remoteSocketId] = [];
+            }
+
+            pendingIceCandidates[remoteSocketId].push(
+                candidate
+            );
+
+        }
+
+
+        /* =========================================
+           FLUSH ICE CANDIDATES
+        ========================================= */
+
+        async function flushIceCandidates(
+            remoteSocketId,
+            peerConnection
+        ) {
+
+            const queued =
+                pendingIceCandidates[remoteSocketId] || [];
+
+            for (const candidate of queued) {
+
+                try {
+
+                    await peerConnection.addIceCandidate(
+                        new RTCIceCandidate(candidate)
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Queued ICE candidate error:",
+                        error
+                    );
+
+                }
+
+            }
+
+            delete pendingIceCandidates[
+                remoteSocketId
+            ];
+
+        }
+
+
+        /* =========================================
+           CREATE PEER CONNECTION
+        ========================================= */
+
+        function createPeerConnection(
+            remoteSocketId
+        ) {
+
+            if (
+                peerConnections[
+                    remoteSocketId
+                ]
+            ) {
+
+                return peerConnections[
+                    remoteSocketId
+                ];
+
+            }
+
+            const peerConnection =
+                new RTCPeerConnection(
+                    rtcConfiguration
+                );
+
+            peerConnections[
+                remoteSocketId
+            ] = peerConnection;
+
+            /* -----------------------------------------
+               ADD LOCAL AUDIO + VIDEO TRACKS
+            ----------------------------------------- */
+
+            if (localStream) {
+
+                localStream
+                    .getTracks()
+                    .forEach(
+                        function (track) {
+
+                            peerConnection.addTrack(
+                                track,
+                                localStream
+                            );
+
+                        }
+                    );
+
+            }
+
+            /* -----------------------------------------
+               RECEIVE REMOTE AUDIO + VIDEO
+            ----------------------------------------- */
+
+            peerConnection.ontrack =
+                function (event) {
+
+                    let remoteStream =
+                        event.streams &&
+                        event.streams[0];
+
+                    /* Some browsers can deliver a track
+                     * without a populated event.streams[0].
+                     * Build a stream in that case.
+                     */
+                    if (!remoteStream) {
+
+                        remoteStream =
+                            new MediaStream();
+
+                        remoteStream.addTrack(
+                            event.track
+                        );
+
+                    }
+
+                    createCallVideoTile(
+                        remoteSocketId,
+                        getPlayerName(
+                            remoteSocketId
+                        ),
+                        remoteStream,
+                        false
+                    );
+
+                };
+
+            /* -----------------------------------------
+               ICE CANDIDATES
+            ----------------------------------------- */
+
+            peerConnection.onicecandidate =
+                function (event) {
+
+                    if (!event.candidate) {
+                        return;
+                    }
+
+                    socket.emit(
+                        "webrtc_ice_candidate",
+                        {
+                            room_code:
+                                roomCode,
+
+                            player_id:
+                                playerId,
+
+                            target_socket_id:
+                                remoteSocketId,
+
+                            candidate:
+                                event.candidate
+                        }
+                    );
+
+                };
+
+            /* -----------------------------------------
+               CONNECTION STATE
+            ----------------------------------------- */
+
+            peerConnection.onconnectionstatechange =
+                function () {
+
+                    const state =
+                        peerConnection.connectionState;
+
+                    console.log(
+                        "WebRTC connection",
+                        remoteSocketId,
+                        state
+                    );
+
+                    if (state === "connected") {
+
+                        setCallStatus(
+                            "📞 Connected to " +
+                            Object.keys(peerConnections).length +
+                            " other participant" +
+                            (
+                                Object.keys(peerConnections).length === 1
+                                    ? ""
+                                    : "s"
+                            )
+                        );
+
+                    }
+
+                    if (
+                        state === "failed" ||
+                        state === "closed"
+                    ) {
+
+                        removePeerConnection(
+                            remoteSocketId
+                        );
+
+                    }
+
+                };
+
+            return peerConnection;
+
+        }
+
+
+        /* =========================================
+           CREATE OFFER
+        ========================================= */
+
+        async function createOffer(
+            remoteSocketId
+        ) {
+
+            if (!inCall || remoteSocketId === socket.id) {
+                return;
+            }
+
+            try {
+
+                const peerConnection =
+                    createPeerConnection(
+                        remoteSocketId
+                    );
+
+                const offer =
+                    await peerConnection.createOffer();
+
+                await peerConnection.setLocalDescription(
+                    offer
+                );
+
+                socket.emit(
+                    "webrtc_offer",
+                    {
+                        room_code:
+                            roomCode,
+
+                        player_id:
+                            playerId,
+
+                        target_socket_id:
+                            remoteSocketId,
+
+                        offer:
+                            offer
+                    }
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Offer error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           RECEIVE OFFER
+        ========================================= */
+
+        socket.on(
+            "webrtc_offer",
+            async function (data) {
+
+                const remoteSocketId =
+                    data.sender_socket_id;
+
+                if (!remoteSocketId) {
+                    return;
+                }
+
+                if (!inCall) {
+                    return;
+                }
+
+                peerNames[remoteSocketId] =
+                    data.sender_name ||
+                    peerNames[remoteSocketId] ||
+                    "Participant";
+
+                try {
+
+                    const peerConnection =
+                        createPeerConnection(
+                            remoteSocketId
+                        );
+
+                    await peerConnection.setRemoteDescription(
+                        new RTCSessionDescription(
+                            data.offer
+                        )
+                    );
+
+                    await flushIceCandidates(
+                        remoteSocketId,
+                        peerConnection
+                    );
+
+                    const answer =
+                        await peerConnection.createAnswer();
+
+                    await peerConnection.setLocalDescription(
+                        answer
+                    );
+
+                    socket.emit(
+                        "webrtc_answer",
+                        {
+                            room_code:
+                                roomCode,
+
+                            player_id:
+                                playerId,
+
+                            target_socket_id:
+                                remoteSocketId,
+
+                            answer:
+                                answer
+                        }
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Offer handling error:",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           RECEIVE ANSWER
+        ========================================= */
+
+        socket.on(
+            "webrtc_answer",
+            async function (data) {
+
+                const remoteSocketId =
+                    data.sender_socket_id;
+
+                if (!remoteSocketId) {
+                    return;
+                }
+
+                try {
+
+                    const peerConnection =
+                        peerConnections[
+                            remoteSocketId
+                        ];
+
+                    if (!peerConnection) {
+                        return;
+                    }
+
+                    await peerConnection.setRemoteDescription(
+                        new RTCSessionDescription(
+                            data.answer
+                        )
+                    );
+
+                    await flushIceCandidates(
+                        remoteSocketId,
+                        peerConnection
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "Answer handling error:",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           RECEIVE ICE CANDIDATE
+        ========================================= */
+
+        socket.on(
+            "webrtc_ice_candidate",
+            async function (data) {
+
+                const remoteSocketId =
+                    data.sender_socket_id;
+
+                const candidate =
+                    data.candidate;
+
+                if (!remoteSocketId || !candidate) {
+                    return;
+                }
+
+                const peerConnection =
+                    peerConnections[
+                        remoteSocketId
+                    ];
+
+                if (
+                    !peerConnection ||
+                    !peerConnection.remoteDescription
+                ) {
+
+                    queueIceCandidate(
+                        remoteSocketId,
+                        candidate
+                    );
+
+                    return;
+
+                }
+
+                try {
+
+                    await peerConnection.addIceCandidate(
+                        new RTCIceCandidate(candidate)
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        "ICE candidate error:",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           EXISTING CALL USERS
+        ========================================= */
+
+        socket.on(
+            "call_existing_users",
+            async function (data) {
+
+                if (!inCall) {
+                    return;
+                }
+
+                const participants =
+                    data.participants || [];
+
+                for (const participant of participants) {
+
+                    const remoteSocketId =
+                        participant.socket_id;
+
+                    if (
+                        !remoteSocketId ||
+                        remoteSocketId === socket.id
+                    ) {
+                        continue;
+                    }
+
+                    /* The new participant is the offerer
+                     * for every existing participant.
+                     */
+                    await createOffer(
+                        remoteSocketId
+                    );
+
+                }
+
+                updateCallStatus();
+
+            }
+        );
+
+
+        /* =========================================
+           NEW CALL USER
+        ========================================= */
+
+        socket.on(
+            "call_user_joined",
+            function (data) {
+
+                const remoteSocketId =
+                    data.socket_id;
+
+                if (
+                    !remoteSocketId ||
+                    remoteSocketId === socket.id
+                ) {
+                    return;
+                }
+
+                peerNames[remoteSocketId] =
+                    data.player_name ||
+                    "Participant";
+
+                if (inCall) {
+
+                    addSystemMessage(
+                        "📞 " +
+                        (
+                            data.player_name ||
+                            "A participant"
+                        ) +
+                        " joined the call."
+                    );
+
+                    updateCallStatus();
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           CALL PARTICIPANT COUNT
+        ========================================= */
+
+        socket.on(
+            "call_participant_count",
+            function (data) {
+
+                if (!inCall) {
+                    return;
+                }
+
+                const count =
+                    Number(data.count || 0);
+
+                if (count <= 1) {
+
+                    setCallStatus(
+                        "You are the only person in the call"
+                    );
+
+                }
+                else {
+
+                    setCallStatus(
+                        "📞 " +
+                        count +
+                        " people in call"
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           CALL USER LEFT
+        ========================================= */
+
+        socket.on(
+            "call_user_left",
+            function (data) {
+
+                const remoteSocketId =
+                    data.socket_id;
+
+                if (!remoteSocketId) {
+                    return;
+                }
+
+                const name =
+                    peerNames[remoteSocketId] ||
+                    "A participant";
+
+                removePeerConnection(
+                    remoteSocketId
+                );
+
+                delete peerNames[
+                    remoteSocketId
+                ];
+
+                delete pendingIceCandidates[
+                    remoteSocketId
+                ];
+
+                if (inCall) {
+
+                    addSystemMessage(
+                        "📞 " +
+                        name +
+                        " left the call."
+                    );
+
+                    updateCallStatus();
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           UPDATE CALL STATUS
+        ========================================= */
+
+        function updateCallStatus() {
+
+            if (!inCall) {
+
+                setCallStatus(
+                    "Not connected to call"
+                );
+
+                return;
+
+            }
+
+            const count =
+                Object.keys(
+                    peerConnections
+                ).length;
+
+            if (count === 0) {
+
+                setCallStatus(
+                    "You are the only person in the call"
+                );
+
+            }
+            else {
+
+                setCallStatus(
+                    "📞 " +
+                    (count + 1) +
+                    " people in call"
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           JOIN CALL
+        ========================================= */
+
+        async function joinCall() {
+
+            if (inCall) {
+                return;
+            }
+
+            clearCallError();
+
+            try {
+
+                localStream =
+                    await navigator.mediaDevices.getUserMedia(
+                        {
+                            audio: true,
+                            video: true
+                        }
+                    );
+
+                inCall = true;
+
+                microphoneEnabled = true;
+
+                cameraEnabled = true;
+
+                createCallVideoTile(
+                    "local",
+                    "You",
+                    localStream,
+                    true
+                );
+
+                callVideoGrid.classList.add(
+                    "active"
+                );
+
+                callControls.classList.add(
+                    "active"
+                );
+
+                joinCallButton.textContent =
+                    "📞 LEAVE CALL";
+
+                joinCallButton.classList.add(
+                    "leave"
+                );
+
+                setCallStatus(
+                    "Joining call..."
+                );
+
+                socket.emit(
+                    "call_join",
+                    {
+                        room_code:
+                            roomCode,
+
+                        player_id:
+                            playerId
+                    }
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    "Could not access camera/microphone:",
+                    error
+                );
+
+                localStream = null;
+
+                inCall = false;
+
+                showCallError(
+                    "Camera or microphone access was denied. Please allow permission in your browser and try again."
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           LEAVE CALL
+        ========================================= */
+
+        function leaveCall() {
+
+            if (!inCall) {
+                return;
+            }
+
+            socket.emit(
+                "call_leave",
+                {
+                    room_code:
+                        roomCode,
+
+                    player_id:
+                        playerId
+                }
+            );
+
+            Object.keys(
+                peerConnections
+            ).forEach(
+                function (remoteSocketId) {
+
+                    const peerConnection =
+                        peerConnections[
+                            remoteSocketId
+                        ];
+
+                    if (peerConnection) {
+                        peerConnection.close();
+                    }
+
+                    delete peerConnections[
+                        remoteSocketId
+                    ];
+
+                    removeCallVideoTile(
+                        remoteSocketId
+                    );
+
+                }
+            );
+
+            Object.keys(
+                pendingIceCandidates
+            ).forEach(
+                function (remoteSocketId) {
+
+                    delete pendingIceCandidates[
+                        remoteSocketId
+                    ];
+
+                }
+            );
+
+            Object.keys(
+                peerNames
+            ).forEach(
+                function (remoteSocketId) {
+
+                    delete peerNames[
+                        remoteSocketId
+                    ];
+
+                }
+            );
+
+            if (localStream) {
+
+                localStream
+                    .getTracks()
+                    .forEach(
+                        function (track) {
+                            track.stop();
+                        }
+                    );
+
+            }
+
+            localStream = null;
+
+            inCall = false;
+
+            microphoneEnabled = true;
+
+            cameraEnabled = true;
+
+            removeCallVideoTile(
+                "local"
+            );
+
+            callVideoGrid.classList.remove(
+                "active"
+            );
+
+            callControls.classList.remove(
+                "active"
+            );
+
+            joinCallButton.textContent =
+                "📞 JOIN CALL";
+
+            joinCallButton.classList.remove(
+                "leave"
+            );
+
+            if (muteButton) {
+                muteButton.textContent =
+                    "🎙️ MUTE";
+                muteButton.classList.remove(
+                    "active-off"
+                );
+            }
+
+            if (cameraButton) {
+                cameraButton.textContent =
+                    "📹 CAMERA OFF";
+                cameraButton.classList.remove(
+                    "active-off"
+                );
+            }
+
+            setCallStatus(
+                "Not connected to call"
+            );
+
+            clearCallError();
+
+        }
+
+
+        /* =========================================
+           REMOVE PEER
+        ========================================= */
+
+        function removePeerConnection(
+            remoteSocketId
+        ) {
+
+            const peerConnection =
+                peerConnections[
+                    remoteSocketId
+                ];
+
+            if (peerConnection) {
+
+                peerConnection.close();
+
+                delete peerConnections[
+                    remoteSocketId
+                ];
+
+            }
+
+            removeCallVideoTile(
+                remoteSocketId
+            );
+
+            updateCallStatus();
+
+        }
+
+
+        /* =========================================
+           JOIN / LEAVE BUTTON
+        ========================================= */
+
+        if (joinCallButton) {
+
+            joinCallButton.addEventListener(
+                "click",
+                function () {
+
+                    if (inCall) {
+                        leaveCall();
+                    }
+                    else {
+                        joinCall();
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           MUTE
+        ========================================= */
+
+        if (muteButton) {
+
+            muteButton.addEventListener(
+                "click",
+                function () {
+
+                    if (!localStream) {
+                        return;
+                    }
+
+                    const audioTracks =
+                        localStream.getAudioTracks();
+
+                    if (audioTracks.length === 0) {
+                        return;
+                    }
+
+                    microphoneEnabled =
+                        !microphoneEnabled;
+
+                    audioTracks.forEach(
+                        function (track) {
+                            track.enabled =
+                                microphoneEnabled;
+                        }
+                    );
+
+                    if (microphoneEnabled) {
+
+                        muteButton.textContent =
+                            "🎙️ MUTE";
+
+                        muteButton.classList.remove(
+                            "active-off"
+                        );
+
+                    }
+                    else {
+
+                        muteButton.textContent =
+                            "🔇 UNMUTE";
+
+                        muteButton.classList.add(
+                            "active-off"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           CAMERA
+        ========================================= */
+
+        if (cameraButton) {
+
+            cameraButton.addEventListener(
+                "click",
+                function () {
+
+                    if (!localStream) {
+                        return;
+                    }
+
+                    const videoTracks =
+                        localStream.getVideoTracks();
+
+                    if (videoTracks.length === 0) {
+                        return;
+                    }
+
+                    cameraEnabled =
+                        !cameraEnabled;
+
+                    videoTracks.forEach(
+                        function (track) {
+                            track.enabled =
+                                cameraEnabled;
+                        }
+                    );
+
+                    if (cameraEnabled) {
+
+                        cameraButton.textContent =
+                            "📹 CAMERA OFF";
+
+                        cameraButton.classList.remove(
+                            "active-off"
+                        );
+
+                    }
+                    else {
+
+                        cameraButton.textContent =
+                            "📹 CAMERA ON";
+
+                        cameraButton.classList.add(
+                            "active-off"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           CLEANUP
         ========================================= */
 
         window.addEventListener(
             "beforeunload",
             function () {
+
+                if (inCall) {
+
+                    socket.emit(
+                        "call_leave",
+                        {
+
+                            room_code:
+                                roomCode,
+
+                            player_id:
+                                playerId
+
+                        }
+                    );
+
+                }
+
+
                 socket.emit(
                     "leave_watch_room",
                     {
+
                         room_code:
                             roomCode
+
                     }
                 );
 
@@ -2461,6 +4181,7 @@
             },
             100
         );
+
 
     </script>
 
