@@ -16,6 +16,10 @@
 
     <style>
 
+        /* =========================================
+           ROOM
+        ========================================= */
+
         .room-container {
             width: 94%;
             max-width: 1400px;
@@ -47,6 +51,7 @@
             grid-template-columns: 1fr 320px;
             gap: 20px;
         }
+
 
         /* =========================================
            VIDEO
@@ -116,6 +121,7 @@
             pointer-events: none;
         }
 
+
         /* =========================================
            SIDEBAR
         ========================================= */
@@ -125,6 +131,8 @@
             border-radius: 15px;
             background: var(--surface);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-title {
@@ -135,6 +143,8 @@
 
         .players {
             padding: 10px;
+            max-height: 180px;
+            overflow-y: auto;
         }
 
         .player {
@@ -163,6 +173,106 @@
             color: var(--cyan);
             letter-spacing: 1px;
         }
+
+
+        /* =========================================
+           CHAT
+        ========================================= */
+
+        .chat-container {
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 360px;
+            min-height: 300px;
+        }
+
+        .chat-header {
+            padding: 15px 18px;
+            border-bottom: 1px solid var(--border);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-message {
+            padding: 9px 11px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, 0.04);
+            word-wrap: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .chat-message.own-message {
+            background: rgba(0, 255, 255, 0.08);
+        }
+
+        .chat-name {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--cyan);
+            margin-bottom: 3px;
+        }
+
+        .chat-text {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .system-message {
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted);
+            padding: 6px 8px;
+            font-style: italic;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 7px;
+            padding: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 11px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: inherit;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: var(--cyan);
+        }
+
+        .chat-send {
+            padding: 10px 13px;
+            border: none;
+            border-radius: 8px;
+            background: var(--cyan);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .chat-send:hover {
+            transform: translateY(-1px);
+        }
+
 
         /* =========================================
            HOST CONTROLS
@@ -248,6 +358,7 @@
             cursor: pointer;
         }
 
+
         /* =========================================
            QUIT
         ========================================= */
@@ -267,6 +378,7 @@
             color: #ef4444;
         }
 
+
         /* =========================================
            SOURCE LABEL
         ========================================= */
@@ -279,6 +391,7 @@
             border-radius: 5px;
             background: rgba(255, 255, 255, 0.08);
         }
+
 
         /* =========================================
            SYNC STATUS
@@ -300,6 +413,7 @@
         .sync-status.show {
             display: block;
         }
+
 
         /* =========================================
            ENABLE PLAYBACK
@@ -329,6 +443,7 @@
             background: var(--cyan);
             color: #000;
         }
+
 
         /* =========================================
            RESPONSIVE
@@ -466,9 +581,7 @@
                 <div class="video-container">
 
 
-                    <!-- =================================
-                         UPLOADED VIDEO
-                    ================================= -->
+                    <!-- UPLOADED VIDEO -->
 
                     {% if room["video_type"] == "upload" %}
 
@@ -485,9 +598,7 @@
                     </video>
 
 
-                    <!-- =================================
-                         YOUTUBE
-                    ================================= -->
+                    <!-- YOUTUBE -->
 
                     {% elif room["video_type"] == "youtube" %}
 
@@ -496,9 +607,7 @@
                     </div>
 
 
-                    <!-- =================================
-                         NO VIDEO
-                    ================================= -->
+                    <!-- NO VIDEO -->
 
                     {% else %}
 
@@ -520,9 +629,7 @@
                     {% endif %}
 
 
-                    <!-- =================================
-                         SYNC STATUS
-                    ================================= -->
+                    <!-- SYNC STATUS -->
 
                     <div id="syncStatus"
                          class="sync-status">
@@ -532,9 +639,7 @@
                     </div>
 
 
-                    <!-- =================================
-                         PLAYBACK BUTTON
-                    ================================= -->
+                    <!-- ENABLE PLAYBACK -->
 
                     <div id="enablePlayback"
                          class="enable-playback">
@@ -549,9 +654,7 @@
                     </div>
 
 
-                    <!-- =================================
-                         VIDEO INFO
-                    ================================= -->
+                    <!-- VIDEO INFO -->
 
                     <div class="video-info">
 
@@ -573,6 +676,8 @@
             ===================================== -->
 
             <aside class="sidebar">
+
+                <!-- PLAYERS -->
 
                 <div class="sidebar-title">
 
@@ -612,6 +717,55 @@
                     </div>
 
                     {% endfor %}
+
+                </div>
+
+
+                <!-- =================================
+                     CHAT
+                ================================= -->
+
+                <div class="chat-container">
+
+                    <div class="chat-header">
+
+                        💬 Party Chat
+
+                    </div>
+
+
+                    <div class="chat-messages"
+                         id="chatMessages">
+
+                        <div class="system-message">
+
+                            You joined the party.
+
+                        </div>
+
+                    </div>
+
+
+                    <form class="chat-input-area"
+                          id="chatForm">
+
+                        <input
+                            type="text"
+                            id="chatInput"
+                            class="chat-input"
+                            placeholder="Type a message..."
+                            maxlength="500"
+                            autocomplete="off">
+
+                        <button
+                            type="submit"
+                            class="chat-send">
+
+                            SEND
+
+                        </button>
+
+                    </form>
 
                 </div>
 
@@ -761,19 +915,7 @@
             playerId ===
             "{{ room['creator_player_id'] }}";
 
-
-        /*
-         * Prevents remote updates from
-         * being sent back to the server.
-         */
-
         let applyingRemoteUpdate = false;
-
-
-        /*
-         * Prevents YouTube events from
-         * creating feedback loops.
-         */
 
         let youtubeReady = false;
 
@@ -793,24 +935,20 @@
                 "videoPlayer"
             );
 
-
         const youtubeContainer =
             document.getElementById(
                 "youtubePlayer"
             );
-
 
         const syncStatus =
             document.getElementById(
                 "syncStatus"
             );
 
-
         const enablePlayback =
             document.getElementById(
                 "enablePlayback"
             );
-
 
         const enablePlaybackButton =
             document.getElementById(
@@ -819,7 +957,27 @@
 
 
         /* =========================================
-           YOUTUBE VIDEO ID
+           CHAT ELEMENTS
+        ========================================= */
+
+        const chatForm =
+            document.getElementById(
+                "chatForm"
+            );
+
+        const chatInput =
+            document.getElementById(
+                "chatInput"
+            );
+
+        const chatMessages =
+            document.getElementById(
+                "chatMessages"
+            );
+
+
+        /* =========================================
+           YOUTUBE ID
         ========================================= */
 
         if (youtubeContainer) {
@@ -828,6 +986,288 @@
                 youtubeContainer.dataset.videoId;
 
         }
+
+
+        /* =========================================
+           CHAT FUNCTIONS
+        ========================================= */
+
+        function scrollChatToBottom() {
+
+            if (!chatMessages) {
+                return;
+            }
+
+            chatMessages.scrollTop =
+                chatMessages.scrollHeight;
+
+        }
+
+
+        function addSystemMessage(message) {
+
+            if (!chatMessages) {
+                return;
+            }
+
+            const systemMessage =
+                document.createElement(
+                    "div"
+                );
+
+            systemMessage.className =
+                "system-message";
+
+            systemMessage.textContent =
+                message;
+
+            chatMessages.appendChild(
+                systemMessage
+            );
+
+            scrollChatToBottom();
+
+        }
+
+
+        function addChatMessage(data) {
+
+            if (!chatMessages) {
+                return;
+            }
+
+            const messageElement =
+                document.createElement(
+                    "div"
+                );
+
+            messageElement.className =
+                "chat-message";
+
+
+            if (
+                data.player_id ===
+                playerId
+            ) {
+
+                messageElement.classList.add(
+                    "own-message"
+                );
+
+            }
+
+
+            const nameElement =
+                document.createElement(
+                    "div"
+                );
+
+            nameElement.className =
+                "chat-name";
+
+            nameElement.textContent =
+                data.player_name;
+
+
+            const textElement =
+                document.createElement(
+                    "div"
+                );
+
+            textElement.className =
+                "chat-text";
+
+            textElement.textContent =
+                data.message;
+
+
+            messageElement.appendChild(
+                nameElement
+            );
+
+            messageElement.appendChild(
+                textElement
+            );
+
+            chatMessages.appendChild(
+                messageElement
+            );
+
+            scrollChatToBottom();
+
+        }
+
+
+        /* =========================================
+           SEND CHAT MESSAGE
+        ========================================= */
+
+        if (chatForm) {
+
+            chatForm.addEventListener(
+                "submit",
+                function (event) {
+
+                    event.preventDefault();
+
+                    const message =
+                        chatInput.value.trim();
+
+
+                    if (!message) {
+                        return;
+                    }
+
+
+                    socket.emit(
+                        "send_chat_message",
+                        {
+
+                            room_code:
+                                roomCode,
+
+                            player_id:
+                                playerId,
+
+                            message:
+                                message
+
+                        }
+                    );
+
+
+                    chatInput.value = "";
+
+                    chatInput.focus();
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           RECEIVE CHAT MESSAGE
+        ========================================= */
+
+        socket.on(
+            "chat_message",
+            function (data) {
+
+                addChatMessage(data);
+
+            }
+        );
+
+
+        /* =========================================
+           MEMBER JOINED
+        ========================================= */
+
+        socket.on(
+            "member_joined",
+            function (data) {
+
+                if (
+                    data.player_id ===
+                    playerId
+                ) {
+                    return;
+                }
+
+                addSystemMessage(
+                    data.player_name +
+                    " joined the party."
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           MEMBER LEFT
+        ========================================= */
+
+        socket.on(
+            "member_left",
+            function (data) {
+
+                if (
+                    data.player_id ===
+                    playerId
+                ) {
+                    return;
+                }
+
+                addSystemMessage(
+                    data.player_name +
+                    " left the party."
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           HOST TRANSFERRED
+        ========================================= */
+
+        socket.on(
+            "host_changed",
+            function (data) {
+
+                const newHostName =
+                    data.player_name ||
+                    "Another player";
+
+
+                if (
+                    data.player_id ===
+                    playerId
+                ) {
+
+                    addSystemMessage(
+                        "👑 You are now the host."
+                    );
+
+                }
+                else {
+
+                    addSystemMessage(
+                        "👑 " +
+                        newHostName +
+                        " is now the host."
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           HOST LEFT
+        ========================================= */
+
+        socket.on(
+            "host_left",
+            function (data) {
+
+                if (
+                    data.player_id ===
+                    playerId
+                ) {
+                    return;
+                }
+
+                addSystemMessage(
+                    "👑 The previous host, " +
+                    data.player_name +
+                    ", left the party."
+                );
+
+            }
+        );
 
 
         /* =========================================
@@ -872,11 +1312,13 @@
                 socket.emit(
                     "join_watch_room",
                     {
+
                         room_code:
                             roomCode,
 
                         player_id:
                             playerId
+
                     }
                 );
 
@@ -931,7 +1373,6 @@
                     "playersList"
                 );
 
-
             const playerCount =
                 document.getElementById(
                     "playerCount"
@@ -943,12 +1384,16 @@
             }
 
 
-            playerCount.textContent =
-                "(" +
-                state.participants.length +
-                "/" +
-                state.max_players +
-                ")";
+            if (playerCount) {
+
+                playerCount.textContent =
+                    "(" +
+                    state.participants.length +
+                    "/" +
+                    state.max_players +
+                    ")";
+
+            }
 
 
             playersList.innerHTML = "";
@@ -962,10 +1407,8 @@
                             "div"
                         );
 
-
                     player.className =
                         "player";
-
 
                     player.dataset.playerId =
                         participant.player_id;
@@ -975,7 +1418,6 @@
                         document.createElement(
                             "span"
                         );
-
 
                     online.className =
                         "online";
@@ -1007,14 +1449,11 @@
                                 "span"
                             );
 
-
                         hostBadge.className =
                             "host-badge";
 
-
                         hostBadge.textContent =
                             "👑 HOST";
-
 
                         player.appendChild(
                             hostBadge
@@ -1107,7 +1546,6 @@
                     "currentVideoName"
                 );
 
-
             const sourceLabel =
                 document.getElementById(
                     "videoSourceLabel"
@@ -1157,7 +1595,7 @@
 
         /* =========================================
            YOUTUBE API READY
-           ========================================= */
+        ========================================= */
 
         function onYouTubeIframeAPIReady() {
 
@@ -1165,11 +1603,9 @@
                 return;
             }
 
-
             if (!youtubeVideoId) {
                 return;
             }
-
 
             createYouTubePlayer();
 
@@ -1178,7 +1614,7 @@
 
         /* =========================================
            CREATE YOUTUBE PLAYER
-           ========================================= */
+        ========================================= */
 
         function createYouTubePlayer() {
 
@@ -1240,14 +1676,6 @@
                 "YouTube player ready."
             );
 
-
-            /*
-             * We intentionally do NOT autoplay
-             * immediately.
-             *
-             * The browser may block autoplay.
-             */
-
         }
 
 
@@ -1262,20 +1690,10 @@
             }
 
 
-            /*
-             * Ignore state changes caused by
-             * remote synchronization.
-             */
-
             if (applyingRemoteUpdate) {
                 return;
             }
 
-
-            /*
-             * Only the HOST is allowed to
-             * broadcast controls.
-             */
 
             if (!isHost) {
                 return;
@@ -1285,8 +1703,6 @@
             const currentTime =
                 youtubePlayer.getCurrentTime();
 
-
-            /* PLAYING */
 
             if (
                 event.data ===
@@ -1311,8 +1727,6 @@
 
             }
 
-
-            /* PAUSED */
 
             else if (
                 event.data ===
@@ -1360,8 +1774,6 @@
 
         if (videoPlayer) {
 
-            /* PLAY */
-
             videoPlayer.addEventListener(
                 "play",
                 function () {
@@ -1395,8 +1807,6 @@
             );
 
 
-            /* PAUSE */
-
             videoPlayer.addEventListener(
                 "pause",
                 function () {
@@ -1429,8 +1839,6 @@
                 }
             );
 
-
-            /* SEEK */
 
             videoPlayer.addEventListener(
                 "seeked",
@@ -1492,8 +1900,6 @@
                 lastRemoteTime =
                     time;
 
-
-                /* UPLOADED VIDEO */
 
                 if (videoPlayer) {
 
@@ -1571,8 +1977,6 @@
                 }
 
 
-                /* YOUTUBE */
-
                 if (
                     youtubePlayer &&
                     youtubeReady
@@ -1583,19 +1987,8 @@
                         true
                     );
 
+                    youtubePlayer.playVideo();
 
-                    const promise =
-                        youtubePlayer.playVideo();
-
-
-                    /*
-                     * YouTube's playVideo()
-                     * does not reliably return
-                     * a normal Promise.
-                     *
-                     * Give the browser a moment,
-                     * then remove the remote flag.
-                     */
 
                     setTimeout(
                         function () {
@@ -1609,6 +2002,7 @@
 
 
                     return;
+
                 }
 
 
@@ -1645,8 +2039,6 @@
                     time;
 
 
-                /* UPLOADED VIDEO */
-
                 if (videoPlayer) {
 
                     videoPlayer.currentTime =
@@ -1670,8 +2062,6 @@
 
                 }
 
-
-                /* YOUTUBE */
 
                 if (
                     youtubePlayer &&
@@ -1735,8 +2125,6 @@
                     time;
 
 
-                /* UPLOADED VIDEO */
-
                 if (videoPlayer) {
 
                     videoPlayer.currentTime =
@@ -1758,8 +2146,6 @@
 
                 }
 
-
-                /* YOUTUBE */
 
                 if (
                     youtubePlayer &&
@@ -1805,9 +2191,6 @@
                 "click",
                 function () {
 
-                    /*
-                     * YOUTUBE
-                     */
 
                     if (
                         youtubePlayer &&
@@ -1849,10 +2232,6 @@
                     }
 
 
-                    /*
-                     * UPLOADED VIDEO
-                     */
-
                     if (videoPlayer) {
 
                         videoPlayer.play()
@@ -1893,12 +2272,10 @@
                 "changeVideoButton"
             );
 
-
         const changePanel =
             document.getElementById(
                 "changeVideoPanel"
             );
-
 
         const cancelButton =
             document.getElementById(
@@ -1947,12 +2324,10 @@
                 "uploadInput"
             );
 
-
         const youtubeInput =
             document.getElementById(
                 "youtubeInput"
             );
-
 
         const videoType =
             document.getElementById(
@@ -2028,13 +2403,6 @@
             "video_changed",
             function (state) {
 
-                /*
-                 * Reloading is intentional.
-                 *
-                 * It creates the correct video
-                 * player for the new source.
-                 */
-
                 window.location.reload();
 
             }
@@ -2069,7 +2437,6 @@
         window.addEventListener(
             "beforeunload",
             function () {
-
                 socket.emit(
                     "leave_watch_room",
                     {
@@ -2079,6 +2446,20 @@
                 );
 
             }
+        );
+
+
+        /* =========================================
+           INITIAL CHAT SCROLL
+        ========================================= */
+
+        setTimeout(
+            function () {
+
+                scrollChatToBottom();
+
+            },
+            100
         );
 
     </script>

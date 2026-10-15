@@ -94,10 +94,6 @@ def initialize_database():
 
     connection = get_db()
 
-    # -----------------------------------------------------
-    # ROOMS
-    # -----------------------------------------------------
-
     connection.execute(
         """
         CREATE TABLE IF NOT EXISTS rooms (
@@ -122,10 +118,6 @@ def initialize_database():
         """
     )
 
-    # -----------------------------------------------------
-    # PARTICIPANTS
-    # -----------------------------------------------------
-
     connection.execute(
         """
         CREATE TABLE IF NOT EXISTS participants (
@@ -139,10 +131,6 @@ def initialize_database():
         )
         """
     )
-
-    # -----------------------------------------------------
-    # PARTICIPANT PLAYER ID
-    # -----------------------------------------------------
 
     participant_columns = connection.execute(
         "PRAGMA table_info(participants)"
@@ -162,10 +150,6 @@ def initialize_database():
             """
         )
 
-    # -----------------------------------------------------
-    # ROOM COLUMNS
-    # -----------------------------------------------------
-
     room_columns = connection.execute(
         "PRAGMA table_info(rooms)"
     ).fetchall()
@@ -174,10 +158,6 @@ def initialize_database():
         column["name"]
         for column in room_columns
     ]
-
-    # -----------------------------------------------------
-    # CREATOR PLAYER ID
-    # -----------------------------------------------------
 
     if "creator_player_id" not in room_column_names:
 
@@ -188,10 +168,6 @@ def initialize_database():
             """
         )
 
-    # -----------------------------------------------------
-    # VIDEO TYPE
-    # -----------------------------------------------------
-
     if "video_type" not in room_column_names:
 
         connection.execute(
@@ -201,10 +177,6 @@ def initialize_database():
             """
         )
 
-    # -----------------------------------------------------
-    # VIDEO SOURCE
-    # -----------------------------------------------------
-
     if "video_source" not in room_column_names:
 
         connection.execute(
@@ -213,10 +185,6 @@ def initialize_database():
             ADD COLUMN video_source TEXT
             """
         )
-
-    # -----------------------------------------------------
-    # VIDEO NAME
-    # -----------------------------------------------------
 
     if "video_name" not in room_column_names:
 
@@ -364,7 +332,6 @@ def allowed_video(filename):
 def delete_room_video(room):
 
     if room is None:
-
         return
 
     try:
@@ -378,11 +345,9 @@ def delete_room_video(room):
         return
 
     if video_type != "upload":
-
         return
 
     if not video_source:
-
         return
 
     filename = os.path.basename(
@@ -412,29 +377,22 @@ def delete_room_video(room):
 def get_youtube_id(url):
 
     if not url:
-
         return None
 
     url = url.strip()
 
     patterns = [
 
-        # youtube.com/watch?v=XXXXXXXXXXX
         r"(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([A-Za-z0-9_-]{11})",
 
-        # youtube.com/watch?v=XXXXXXXXXXX&...
         r"(?:https?://)?(?:www\.)?youtube\.com/watch\?[^#]*v=([A-Za-z0-9_-]{11})",
 
-        # youtu.be/XXXXXXXXXXX
         r"(?:https?://)?(?:www\.)?youtu\.be/([A-Za-z0-9_-]{11})",
 
-        # youtube.com/embed/XXXXXXXXXXX
         r"(?:https?://)?(?:www\.)?youtube\.com/embed/([A-Za-z0-9_-]{11})",
 
-        # youtube.com/shorts/XXXXXXXXXXX
         r"(?:https?://)?(?:www\.)?youtube\.com/shorts/([A-Za-z0-9_-]{11})",
 
-        # youtube-nocookie.com/embed/XXXXXXXXXXX
         r"(?:https?://)?(?:www\.)?youtube-nocookie\.com/embed/([A-Za-z0-9_-]{11})"
 
     ]
@@ -542,7 +500,6 @@ def get_room_state(room_code):
         "participants": [
 
             {
-
                 "player_name":
                     participant["player_name"],
 
@@ -645,10 +602,6 @@ def create_room():
 
     video_name = None
 
-    # =====================================================
-    # UPLOAD VIDEO
-    # =====================================================
-
     if video_type == "upload":
 
         video_file = request.files.get(
@@ -715,10 +668,6 @@ def create_room():
 
         video_name = original_filename
 
-    # =====================================================
-    # YOUTUBE
-    # =====================================================
-
     elif video_type == "youtube":
 
         youtube_url = request.form.get(
@@ -747,10 +696,6 @@ def create_room():
             "create_room.html",
             error="Please choose a video source."
         )
-
-    # =====================================================
-    # INSERT ROOM
-    # =====================================================
 
     connection = get_db()
 
@@ -788,10 +733,6 @@ def create_room():
             )
         )
 
-        # =================================================
-        # INSERT CREATOR
-        # =================================================
-
         connection.execute(
             """
             INSERT INTO participants
@@ -825,13 +766,8 @@ def create_room():
         ):
 
             try:
-
-                os.remove(
-                    video_source
-                )
-
+                os.remove(video_source)
             except OSError:
-
                 pass
 
         return render_template(
@@ -840,10 +776,6 @@ def create_room():
         )
 
     connection.close()
-
-    # =====================================================
-    # SESSION
-    # =====================================================
 
     session["player_name"] = creator
 
@@ -885,7 +817,6 @@ def room_created(room_code):
     connection.close()
 
     if room is None:
-
         return "Room not found", 404
 
     return render_template(
@@ -1076,9 +1007,7 @@ def join_public(room_code):
     if not player_name:
 
         return redirect(
-            url_for(
-                "public_rooms"
-            )
+            url_for("public_rooms")
         )
 
     connection = get_db()
@@ -1101,7 +1030,6 @@ def join_public(room_code):
     connection.close()
 
     if room is None:
-
         return "Room not found.", 404
 
     player_count = get_player_count(
@@ -1111,9 +1039,7 @@ def join_public(room_code):
     if player_count >= room["max_players"]:
 
         return redirect(
-            url_for(
-                "public_rooms"
-            )
+            url_for("public_rooms")
         )
 
     player_id = generate_player_id()
@@ -1287,25 +1213,13 @@ def temporary_video(room_code):
     connection.close()
 
     if room is None:
-
-        return (
-            "Room not found.",
-            404
-        )
+        return "Room not found.", 404
 
     if room["video_type"] != "upload":
-
-        return (
-            "This room is not using an uploaded video.",
-            400
-        )
+        return "This room is not using an uploaded video.", 400
 
     if not room["video_source"]:
-
-        return (
-            "Video not found.",
-            404
-        )
+        return "Video not found.", 404
 
     filename = os.path.basename(
         room["video_source"]
@@ -1317,11 +1231,7 @@ def temporary_video(room_code):
     )
 
     if not os.path.isfile(filepath):
-
-        return (
-            "Video file not found.",
-            404
-        )
+        return "Video file not found.", 404
 
     return send_from_directory(
         app.config["UPLOAD_FOLDER"],
@@ -1345,11 +1255,7 @@ def change_video(room_code):
     )
 
     if not player_id:
-
-        return (
-            "Player identity missing.",
-            400
-        )
+        return "Player identity missing.", 400
 
     connection = get_db()
 
@@ -1370,14 +1276,7 @@ def change_video(room_code):
 
         connection.close()
 
-        return (
-            "Room not found.",
-            404
-        )
-
-    # =====================================================
-    # HOST CHECK
-    # =====================================================
+        return "Room not found.", 404
 
     if player_id != room["creator_player_id"]:
 
@@ -1396,10 +1295,6 @@ def change_video(room_code):
 
     new_video_name = None
 
-    # =====================================================
-    # NEW UPLOAD
-    # =====================================================
-
     if video_type == "upload":
 
         video_file = request.files.get(
@@ -1413,10 +1308,7 @@ def change_video(room_code):
 
             connection.close()
 
-            return (
-                "Please select a video.",
-                400
-            )
+            return "Please select a video.", 400
 
         if not allowed_video(
             video_file.filename
@@ -1424,10 +1316,7 @@ def change_video(room_code):
 
             connection.close()
 
-            return (
-                "Unsupported video format.",
-                400
-            )
+            return "Unsupported video format.", 400
 
         original_filename = (
             video_file.filename
@@ -1469,10 +1358,6 @@ def change_video(room_code):
 
         new_video_name = original_filename
 
-    # =====================================================
-    # NEW YOUTUBE VIDEO
-    # =====================================================
-
     elif video_type == "youtube":
 
         youtube_url = request.form.get(
@@ -1488,10 +1373,7 @@ def change_video(room_code):
 
             connection.close()
 
-            return (
-                "Invalid YouTube URL.",
-                400
-            )
+            return "Invalid YouTube URL.", 400
 
         new_video_source = youtube_id
 
@@ -1501,14 +1383,7 @@ def change_video(room_code):
 
         connection.close()
 
-        return (
-            "Invalid video type.",
-            400
-        )
-
-    # =====================================================
-    # DELETE OLD UPLOAD
-    # =====================================================
+        return "Invalid video type.", 400
 
     old_video_type = room["video_type"]
 
@@ -1530,21 +1405,11 @@ def change_video(room_code):
 
         try:
 
-            if os.path.exists(
-                old_filepath
-            ):
-
-                os.remove(
-                    old_filepath
-                )
+            if os.path.exists(old_filepath):
+                os.remove(old_filepath)
 
         except OSError:
-
             pass
-
-    # =====================================================
-    # UPDATE ROOM
-    # =====================================================
 
     connection.execute(
         """
@@ -1568,10 +1433,6 @@ def change_video(room_code):
     connection.commit()
 
     connection.close()
-
-    # =====================================================
-    # BROADCAST VIDEO CHANGE
-    # =====================================================
 
     state = get_room_state(
         room_code
@@ -1606,13 +1467,11 @@ def quit_room(room_code):
     )
 
     if not player_id:
-
         player_id = session.get(
             "player_id"
         )
 
     if not player_id:
-
         return redirect(
             url_for("home")
         )
@@ -1658,21 +1517,21 @@ def quit_room(room_code):
         )
     ).fetchone()
 
+    connection.close()
+
     if participant is None:
 
-        connection.close()
+        session.clear()
 
         return redirect(
             url_for("home")
         )
 
-    # =====================================================
+    # -----------------------------------------------------
     # HOST
-    # =====================================================
+    # -----------------------------------------------------
 
     if player_id == room["creator_player_id"]:
-
-        connection.close()
 
         return render_template(
             "host_quit.html",
@@ -1680,39 +1539,17 @@ def quit_room(room_code):
             player_id=player_id
         )
 
-    # =====================================================
-    # NORMAL PLAYER
-    # =====================================================
-
-    connection.execute(
-        """
-        DELETE FROM participants
-
-        WHERE room_code = ?
-
-        AND player_id = ?
-        """,
-        (
-            room_code,
-            player_id
-        )
-    )
-
-    connection.commit()
-
-    connection.close()
-
-    broadcast_room_update(
-        room_code
-    )
-
-    session.clear()
+    # -----------------------------------------------------
+    # NORMAL MEMBER
+    # -----------------------------------------------------
 
     return redirect(
-        url_for("home")
+        url_for(
+            "watch_room",
+            room_code=room_code,
+            player_id=player_id
+        )
     )
-
-
 # =========================================================
 # DELETE ROOM
 # =========================================================
@@ -1723,21 +1560,13 @@ def quit_room(room_code):
 )
 def delete_room(room_code):
 
-    player_id = request.form.get(
-        "player_id"
+    player_id = (
+        request.form.get("player_id")
+        or session.get("player_id")
     )
 
     if not player_id:
-
-        player_id = session.get(
-            "player_id"
-        )
-
-    if not player_id:
-
-        return redirect(
-            url_for("home")
-        )
+        return redirect(url_for("home"))
 
     connection = get_db()
 
@@ -1758,13 +1587,7 @@ def delete_room(room_code):
 
         session.clear()
 
-        return redirect(
-            url_for("home")
-        )
-
-    # =====================================================
-    # HOST CHECK
-    # =====================================================
+        return redirect(url_for("home"))
 
     if player_id != room["creator_player_id"]:
 
@@ -1775,17 +1598,7 @@ def delete_room(room_code):
             403
         )
 
-    # =====================================================
-    # DELETE TEMPORARY VIDEO
-    # =====================================================
-
-    delete_room_video(
-        room
-    )
-
-    # =====================================================
-    # NOTIFY EVERYONE
-    # =====================================================
+    delete_room_video(room)
 
     socketio.emit(
         "room_deleted",
@@ -1796,10 +1609,6 @@ def delete_room(room_code):
         to=room_code
     )
 
-    # =====================================================
-    # DELETE PARTICIPANTS
-    # =====================================================
-
     connection.execute(
         """
         DELETE FROM participants
@@ -1808,10 +1617,6 @@ def delete_room(room_code):
         """,
         (room_code,)
     )
-
-    # =====================================================
-    # DEACTIVATE ROOM
-    # =====================================================
 
     connection.execute(
         """
@@ -1848,15 +1653,10 @@ def delete_room(room_code):
 )
 def leave_room_route(room_code):
 
-    player_id = request.form.get(
-        "player_id"
+    player_id = (
+        request.form.get("player_id")
+        or session.get("player_id")
     )
-
-    if not player_id:
-
-        player_id = session.get(
-            "player_id"
-        )
 
     if not player_id:
 
@@ -1865,6 +1665,10 @@ def leave_room_route(room_code):
         )
 
     connection = get_db()
+
+    # -----------------------------------------------------
+    # GET ACTIVE ROOM
+    # -----------------------------------------------------
 
     room = connection.execute(
         """
@@ -1889,9 +1693,9 @@ def leave_room_route(room_code):
             url_for("home")
         )
 
-    # =====================================================
-    # HOST CHECK
-    # =====================================================
+    # -----------------------------------------------------
+    # VERIFY HOST
+    # -----------------------------------------------------
 
     if player_id != room["creator_player_id"]:
 
@@ -1902,13 +1706,17 @@ def leave_room_route(room_code):
             403
         )
 
-    # =====================================================
-    # REMOVE HOST
-    # =====================================================
+    # -----------------------------------------------------
+    # GET OLD HOST NAME
+    # -----------------------------------------------------
 
-    connection.execute(
+    old_host = connection.execute(
         """
-        DELETE FROM participants
+        SELECT
+            player_name,
+            player_id
+
+        FROM participants
 
         WHERE room_code = ?
 
@@ -1918,11 +1726,23 @@ def leave_room_route(room_code):
             room_code,
             player_id
         )
-    )
+    ).fetchone()
 
-    # =====================================================
-    # FIND NEW HOST
-    # =====================================================
+    if old_host is None:
+
+        connection.close()
+
+        session.clear()
+
+        return redirect(
+            url_for("home")
+        )
+
+    old_host_name = old_host["player_name"]
+
+    # -----------------------------------------------------
+    # FIND NEXT HOST
+    # -----------------------------------------------------
 
     new_host = connection.execute(
         """
@@ -1934,19 +1754,41 @@ def leave_room_route(room_code):
 
         WHERE room_code = ?
 
+        AND player_id != ?
+
         ORDER BY id ASC
 
         LIMIT 1
         """,
-        (room_code,)
+        (
+            room_code,
+            player_id
+        )
     ).fetchone()
 
-    # =====================================================
-    # TRANSFER HOST
-    # =====================================================
+    # -----------------------------------------------------
+    # CASE 1:
+    # OTHER MEMBERS EXIST
+    # -----------------------------------------------------
 
-    if new_host:
+    if new_host is not None:
 
+        # Remove old host
+        connection.execute(
+            """
+            DELETE FROM participants
+
+            WHERE room_code = ?
+
+            AND player_id = ?
+            """,
+            (
+                room_code,
+                player_id
+            )
+        )
+
+        # Transfer host
         connection.execute(
             """
             UPDATE rooms
@@ -1968,18 +1810,63 @@ def leave_room_route(room_code):
 
         connection.close()
 
+        # -------------------------------------------------
+        # NOTIFY EVERYONE STILL IN THE ROOM
+        # -------------------------------------------------
+
+        socketio.emit(
+            "member_left",
+            {
+                "player_name": old_host_name,
+
+                "message":
+                    old_host_name
+                    + " left the room."
+            },
+            to=room_code
+        )
+
+        socketio.emit(
+            "host_changed",
+            {
+                "new_host_name":
+                    new_host["player_name"],
+
+                "new_host_id":
+                    new_host["player_id"],
+
+                "message":
+                    new_host["player_name"]
+                    + " is now the host."
+            },
+            to=room_code
+        )
+
+        # Send the NEW room state.
+        # This is important because creator_player_id
+        # has now changed.
         broadcast_room_update(
             room_code
         )
 
-    # =====================================================
-    # NO PLAYERS LEFT
-    # =====================================================
+    # -----------------------------------------------------
+    # CASE 2:
+    # HOST WAS THE ONLY PERSON
+    # -----------------------------------------------------
 
     else:
 
         delete_room_video(
             room
+        )
+
+        connection.execute(
+            """
+            DELETE FROM participants
+
+            WHERE room_code = ?
+            """,
+            (room_code,)
         )
 
         connection.execute(
@@ -2009,6 +1896,127 @@ def leave_room_route(room_code):
             to=room_code
         )
 
+    # -----------------------------------------------------
+    # CLEAR HOST SESSION
+    # -----------------------------------------------------
+
+    session.clear()
+
+    return redirect(
+        url_for("home")
+    )
+# =========================================================
+# NORMAL MEMBER LEAVES
+# =========================================================
+
+@app.route(
+    "/leave-member/<room_code>",
+    methods=["POST"]
+)
+def leave_member(room_code):
+
+    player_id = (
+        request.form.get("player_id")
+        or session.get("player_id")
+    )
+
+    if not player_id:
+        return redirect(url_for("home"))
+
+    connection = get_db()
+
+    room = connection.execute(
+        """
+        SELECT *
+
+        FROM rooms
+
+        WHERE room_code = ?
+
+        AND active = 1
+        """,
+        (room_code,)
+    ).fetchone()
+
+    if room is None:
+
+        connection.close()
+
+        session.clear()
+
+        return redirect(url_for("home"))
+
+    participant = connection.execute(
+        """
+        SELECT player_name
+
+        FROM participants
+
+        WHERE room_code = ?
+
+        AND player_id = ?
+        """,
+        (
+            room_code,
+            player_id
+        )
+    ).fetchone()
+
+    if participant is None:
+
+        connection.close()
+
+        session.clear()
+
+        return redirect(url_for("home"))
+
+    # Host must use host leave route.
+    if player_id == room["creator_player_id"]:
+
+        connection.close()
+
+        return (
+            "The host must use the host leave option.",
+            403
+        )
+
+    player_name = participant["player_name"]
+
+    connection.execute(
+        """
+        DELETE FROM participants
+
+        WHERE room_code = ?
+
+        AND player_id = ?
+        """,
+        (
+            room_code,
+            player_id
+        )
+    )
+
+    connection.commit()
+
+    connection.close()
+
+    socketio.emit(
+        "member_left",
+        {
+            "player_name":
+                player_name,
+
+            "message":
+                player_name
+                + " left the room."
+        },
+        to=room_code
+    )
+
+    broadcast_room_update(
+        room_code
+    )
+
     session.clear()
 
     return redirect(
@@ -2034,7 +2042,6 @@ def handle_join_watch_room(data):
     )
 
     if not room_code or not player_id:
-
         return
 
     connection = get_db()
@@ -2071,7 +2078,6 @@ def handle_join_watch_room(data):
     connection.close()
 
     if participant is None or room is None:
-
         return
 
     join_room(
@@ -2121,192 +2127,7 @@ def handle_leave_watch_room(data):
 )
 def handle_disconnect():
 
-    player_id = session.get(
-        "player_id"
-    )
-
-    room_code = session.get(
-        "room_code"
-    )
-
-    if not player_id or not room_code:
-
-        return
-
-    connection = get_db()
-
-    room = connection.execute(
-        """
-        SELECT *
-
-        FROM rooms
-
-        WHERE room_code = ?
-
-        AND active = 1
-        """,
-        (room_code,)
-    ).fetchone()
-
-    if room is None:
-
-        connection.close()
-
-        return
-
-    participant = connection.execute(
-        """
-        SELECT *
-
-        FROM participants
-
-        WHERE room_code = ?
-
-        AND player_id = ?
-        """,
-        (
-            room_code,
-            player_id
-        )
-    ).fetchone()
-
-    if participant is None:
-
-        connection.close()
-
-        return
-
-    # =====================================================
-    # HOST DISCONNECTED
-    # =====================================================
-
-    if player_id == room["creator_player_id"]:
-
-        new_host = connection.execute(
-            """
-            SELECT
-                player_name,
-                player_id
-
-            FROM participants
-
-            WHERE room_code = ?
-
-            AND player_id != ?
-
-            ORDER BY id ASC
-
-            LIMIT 1
-            """,
-            (
-                room_code,
-                player_id
-            )
-        ).fetchone()
-
-        # Remove old host
-
-        connection.execute(
-            """
-            DELETE FROM participants
-
-            WHERE room_code = ?
-
-            AND player_id = ?
-            """,
-            (
-                room_code,
-                player_id
-            )
-        )
-
-        if new_host:
-
-            connection.execute(
-                """
-                UPDATE rooms
-
-                SET
-                    creator = ?,
-                    creator_player_id = ?
-
-                WHERE room_code = ?
-                """,
-                (
-                    new_host["player_name"],
-                    new_host["player_id"],
-                    room_code
-                )
-            )
-
-            connection.commit()
-
-            connection.close()
-
-            broadcast_room_update(
-                room_code
-            )
-
-        else:
-
-            delete_room_video(
-                room
-            )
-
-            connection.execute(
-                """
-                UPDATE rooms
-
-                SET
-                    active = 0,
-                    video_source = NULL,
-                    video_name = NULL
-
-                WHERE room_code = ?
-                """,
-                (room_code,)
-            )
-
-            connection.commit()
-
-            connection.close()
-
-            socketio.emit(
-                "room_deleted",
-                {
-                    "message":
-                        "The host left and the party has ended."
-                },
-                to=room_code
-            )
-
-    # =====================================================
-    # NORMAL PLAYER DISCONNECTED
-    # =====================================================
-
-    else:
-
-        connection.execute(
-            """
-            DELETE FROM participants
-
-            WHERE room_code = ?
-
-            AND player_id = ?
-            """,
-            (
-                room_code,
-                player_id
-            )
-        )
-
-        connection.commit()
-
-        connection.close()
-
-        broadcast_room_update(
-            room_code
-        )
+    return
 
 
 # =========================================================
@@ -2335,7 +2156,6 @@ def handle_video_play(data):
     )
 
     if not room_code or not player_id:
-
         return
 
     connection = get_db()
@@ -2356,13 +2176,11 @@ def handle_video_play(data):
     connection.close()
 
     if room is None:
-
         return
 
     if player_id != room[
         "creator_player_id"
     ]:
-
         return
 
     socketio.emit(
@@ -2402,7 +2220,6 @@ def handle_video_pause(data):
     )
 
     if not room_code or not player_id:
-
         return
 
     connection = get_db()
@@ -2423,13 +2240,11 @@ def handle_video_pause(data):
     connection.close()
 
     if room is None:
-
         return
 
     if player_id != room[
         "creator_player_id"
     ]:
-
         return
 
     socketio.emit(
@@ -2469,7 +2284,6 @@ def handle_video_seek(data):
     )
 
     if not room_code or not player_id:
-
         return
 
     connection = get_db()
@@ -2490,13 +2304,11 @@ def handle_video_seek(data):
     connection.close()
 
     if room is None:
-
         return
 
     if player_id != room[
         "creator_player_id"
     ]:
-
         return
 
     socketio.emit(
@@ -2507,6 +2319,87 @@ def handle_video_seek(data):
         },
         to=room_code,
         include_self=False
+    )
+
+
+# =========================================================
+# CHAT MESSAGE
+# =========================================================
+
+@socketio.on(
+    "send_chat_message"
+)
+def handle_chat_message(data):
+
+    room_code = data.get(
+        "room_code"
+    )
+
+    player_id = (
+        data.get("player_id")
+        or session.get("player_id")
+    )
+
+    message = data.get(
+        "message",
+        ""
+    ).strip()
+
+    if not room_code or not player_id or not message:
+        return
+
+    if len(message) > 500:
+        message = message[:500]
+
+    connection = get_db()
+
+    participant = connection.execute(
+        """
+        SELECT player_name
+
+        FROM participants
+
+        WHERE room_code = ?
+
+        AND player_id = ?
+        """,
+        (
+            room_code,
+            player_id
+        )
+    ).fetchone()
+
+    room = connection.execute(
+        """
+        SELECT room_code
+
+        FROM rooms
+
+        WHERE room_code = ?
+
+        AND active = 1
+        """,
+        (room_code,)
+    ).fetchone()
+
+    connection.close()
+
+    if participant is None or room is None:
+        return
+
+    socketio.emit(
+        "chat_message",
+        {
+            "player_name":
+                participant["player_name"],
+
+            "player_id":
+                player_id,
+
+            "message":
+                message
+        },
+        to=room_code
     )
 
 
