@@ -1543,12 +1543,45 @@ def quit_room(room_code):
     # NORMAL MEMBER
     # -----------------------------------------------------
 
-    return redirect(
-        url_for(
-            "watch_room",
-            room_code=room_code,
-            player_id=player_id
+    player_name = participant["player_name"]
+
+    connection = get_db()
+
+    connection.execute(
+        """
+        DELETE FROM participants
+        WHERE room_code = ?
+        AND player_id = ?
+        """,
+        (
+            room_code,
+            player_id
         )
+    )
+
+    connection.commit()
+    connection.close()
+
+    socketio.emit(
+        "member_left",
+        {
+            "player_id": player_id,
+            "player_name": player_name,
+            "message":
+                player_name
+                + " left the room."
+        },
+        to=room_code
+    )
+
+    broadcast_room_update(
+        room_code
+    )
+
+    session.clear()
+
+    return redirect(
+        url_for("home")
     )
 
 

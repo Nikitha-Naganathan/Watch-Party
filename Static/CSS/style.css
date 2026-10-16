@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "MainFont";
+    src: url("../Fonts/main.ttf") format("truetype");
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -22,7 +27,7 @@ body {
     min-height: 100vh;
     background: var(--bg);
     color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "MainFont", sans-serif;
     overflow-x: hidden;
 }
 
@@ -444,6 +449,7 @@ footer span {
         gap: 20px;
     }
 }
+
 body.light-mode {
     --bg: #f4f5ff;
     --surface: rgba(255, 255, 255, 0.8);
@@ -454,18 +460,12 @@ body.light-mode {
 
 body.light-mode .background::before {
     background:
-        linear-gradient(
-            rgba(244, 245, 255, 0.8),
-            rgba(244, 245, 255, 0.92)
-        ),
-        radial-gradient(
-            circle at 20% 20%,
+        linear-gradient(rgba(244, 245, 255, 0.8),
+            rgba(244, 245, 255, 0.92)),
+        radial-gradient(circle at 20% 20%,
             rgba(168, 85, 247, 0.18),
-            transparent 35%
-        ),
-        radial-gradient(
-            circle at 80% 70%,
+            transparent 35%),
+        radial-gradient(circle at 80% 70%,
             rgba(34, 211, 238, 0.15),
-            transparent 35%
-        );
+            transparent 35%);
 }
