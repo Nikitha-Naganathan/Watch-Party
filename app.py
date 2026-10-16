@@ -2937,10 +2937,5 @@ def handle_disconnect():
 # =========================================================
 
 if __name__ == "__main__":
-
     initialize_database()
-
-    socketio.run(
-        app,
-        debug=True
-    )
+    socketio.run(app)
