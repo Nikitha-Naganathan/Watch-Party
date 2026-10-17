@@ -77,3 +77,36 @@ Watch-Party/
 ├── app.py
 ├── requirements.txt
 └── README.md
+```
+## Run Locally
+1. Clone the repository
+git clone https://github.com/Nikitha-Naganathan/Watch-Party.git
+
+2. Open the project folder
+cd Watch-Party
+
+3. Create a virtual environment
+Windows:
+python -m venv venv
+venv\Scripts\activate
+
+4. Install dependencies
+pip install -r requirements.txt
+
+5. Run the application
+python app.py
+
+## Deployment
+StreamMates is deployed using Render.
+The application runs using Gunicorn and Flask-SocketIO.
+
+## Project Objective
+StreamMates aims to make online movie and video watching more social by allowing friends to watch content together in a synchronized environment, communicate through live chat, and enjoy a shared virtual viewing experience.
+
+## Future Scope
+- User authentication and profiles
+- Persistent chat history
+- More customization options
+- Improved scalability for larger watch parties
+- Reactions during streaming of videos
+- Integration of using various websites and not only youtube
