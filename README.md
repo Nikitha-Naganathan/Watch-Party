@@ -1,37 +1,48 @@
-#  StreamMates
+# 🎬 StreamMates
 
 ### Watch Together. Anywhere.
 
-StreamMates is a web-based watch party application that allows friends to watch videos together in real time, communicate through live chat, and enjoy a shared streaming experience from different locations.
+**StreamMates** is a real-time web-based watch party application that allows friends to watch videos together from different locations.
+
+Users can create or join rooms, synchronize video playback, communicate through live chat, and enjoy a shared watching experience.
+
+##  Live Demo
+
+🔗 **[Open StreamMates](https://streammates.onrender.com/)**
 
 ##  Features
 
--  **Synchronized Watching** – Keep video playback synchronized for everyone in a room.
--  **Live Chat** – Communicate with other participants in real time.
--  **Create Rooms** – Create a private watch room and invite friends.
--  **Join Rooms** – Join an existing room using its room details.
--  **Custom Themes** – Switch between different visual themes.
--  **Real-Time Interaction** – Changes made by one participant can be reflected across the room.
--  **Database Support** – Store room and application data using SQLite.
+-  **Synchronized Watching**  
+  Video playback is synchronized between users in the same room.
 
-##  Technologies Used
+- **Create a Room**  
+  Create a watch room and invite friends to join.
 
-### Frontend
-- HTML5
-- CSS3
-- JavaScript
+- **Join a Room**  
+  Join an existing watch party using the room details.
 
-### Backend
-- Python
-- Flask
-- Flask-SocketIO
+-  **Live Chat**  
+  Communicate with other participants in real time.
 
-### Database
-- SQLite
+- **Custom Themes**  
+  Switch between different visual themes.
+  NOTE: Not yet applied. Only the buttons are there, but the theme is yet to be applied
 
-### Real-Time Communication
-- WebSockets
-- Socket.IO
+- **Real-Time Communication**  
+  Uses Socket.IO to communicate changes between connected users.
+
+- **Database Support**  
+  Uses SQLite for storing application and room-related data.
+
+##Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Frontend | HTML5, CSS3, JavaScript |
+| Backend | Python, Flask |
+| Real-Time Communication | Flask-SocketIO |
+| Database | SQLite |
+| Deployment | Render |
 
 ## 📁 Project Structure
 
