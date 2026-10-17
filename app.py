@@ -27,7 +27,7 @@ import re
 # APP
 # =========================================================
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='Static')
 
 app.config["SECRET_KEY"] = "watch-party-secret-key"
 
