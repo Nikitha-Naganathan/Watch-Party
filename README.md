@@ -110,3 +110,7 @@ StreamMates aims to make online movie and video watching more social by allowing
 - Improved scalability for larger watch parties
 - Reactions during streaming of videos
 - Integration of using various websites and not only youtube
+
+## Author
+Nikitha Naganathan
+Github: https://github.com/Nikitha-Naganathan
