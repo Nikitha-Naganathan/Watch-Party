@@ -27,13 +27,16 @@ import re
 # APP
 # =========================================================
 
-app = Flask(__name__, static_folder='Static', static_url_path='/Static')
+app = Flask(__name__)
 
 app.config["SECRET_KEY"] = "watch-party-secret-key"
 
 socketio = SocketIO(
     app,
-    cors_allowed_origins="*"
+    cors_allowed_origins="*",
+    async_mode="threading",
+    logger=True,
+    engineio_logger=True
 )
 
 
@@ -198,6 +201,12 @@ def initialize_database():
     connection.commit()
 
     connection.close()
+
+
+# Initialize the database when the module is imported.
+# Gunicorn imports app.py, so the __main__ block is not executed
+# when the application is deployed on Render.
+initialize_database()
 
 
 # =========================================================
@@ -2937,5 +2946,8 @@ def handle_disconnect():
 # =========================================================
 
 if __name__ == "__main__":
-    initialize_database()
-    socketio.run(app)
+
+    socketio.run(
+        app,
+        debug=True
+    )
