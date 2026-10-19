@@ -207,9 +207,7 @@ def initialize_database():
     connection.close()
 
 
-# Initialize the database when the module is imported.
-# Gunicorn imports app.py, so the __main__ block is not executed
-# when the application is deployed on Render.
+# Initialize database
 initialize_database()
 
 
@@ -1563,7 +1561,9 @@ def quit_room(room_code):
     connection.execute(
         """
         DELETE FROM participants
+
         WHERE room_code = ?
+
         AND player_id = ?
         """,
         (
@@ -2155,18 +2155,6 @@ def handle_leave_watch_room(data):
 
 
 # =========================================================
-# PLAYER DISCONNECT
-# =========================================================
-
-@socketio.on(
-    "disconnect"
-)
-def handle_disconnect():
-
-    return
-
-
-# =========================================================
 # VIDEO PLAY
 # =========================================================
 
@@ -2440,6 +2428,120 @@ def handle_chat_message(data):
 
 
 # =========================================================
+# CHAT REACTIONS
+# =========================================================
+
+ALLOWED_REACTIONS = {
+    "❤️",
+    "😂",
+    "😮",
+    "😢",
+    "👍",
+    "👏",
+    "🔥",
+    "😍",
+    "😡",
+    "🎉"
+}
+
+
+@socketio.on(
+    "send_reaction"
+)
+def handle_send_reaction(data):
+
+    room_code = data.get(
+        "room_code"
+    )
+
+    player_id = (
+        data.get("player_id")
+        or session.get("player_id")
+    )
+
+    reaction = data.get(
+        "reaction",
+        ""
+    ).strip()
+
+    # -----------------------------------------------------
+    # VALIDATE
+    # -----------------------------------------------------
+
+    if (
+        not room_code
+        or not player_id
+        or not reaction
+    ):
+        return
+
+    if reaction not in ALLOWED_REACTIONS:
+        return
+
+    # -----------------------------------------------------
+    # VERIFY PARTICIPANT
+    # -----------------------------------------------------
+
+    connection = get_db()
+
+    participant = connection.execute(
+        """
+        SELECT
+            player_name,
+            player_id
+
+        FROM participants
+
+        WHERE room_code = ?
+
+        AND player_id = ?
+        """,
+        (
+            room_code,
+            player_id
+        )
+    ).fetchone()
+
+    room = connection.execute(
+        """
+        SELECT
+            room_code
+
+        FROM rooms
+
+        WHERE room_code = ?
+
+        AND active = 1
+        """,
+        (room_code,)
+    ).fetchone()
+
+    connection.close()
+
+    if participant is None or room is None:
+        return
+
+    # -----------------------------------------------------
+    # BROADCAST REACTION
+    # -----------------------------------------------------
+
+    socketio.emit(
+        "reaction_received",
+        {
+            "reaction":
+                reaction,
+
+            "player_name":
+                participant["player_name"],
+
+            "player_id":
+                player_id
+        },
+        to=room_code
+    )
+
+
+# =========================================================
 # WEBRTC CALL HELPERS
 # =========================================================
 
@@ -2497,7 +2599,9 @@ def is_valid_call_participant(
 
 def get_call_members(room_code):
 
-    call_room = get_call_room(room_code)
+    call_room = get_call_room(
+        room_code
+    )
 
     try:
 
@@ -2513,11 +2617,16 @@ def get_call_members(room_code):
         return []
 
 
-def get_call_socket_ids(room_code, exclude_socket_id=None):
+def get_call_socket_ids(
+    room_code,
+    exclude_socket_id=None
+):
 
     socket_ids = []
 
-    for sid, _ in get_call_members(room_code):
+    for sid, _ in get_call_members(
+        room_code
+    ):
 
         if sid == exclude_socket_id:
             continue
@@ -2531,7 +2640,9 @@ def get_call_socket_ids(room_code, exclude_socket_id=None):
 # WEBRTC CALL SIGNALING - JOIN
 # =========================================================
 
-@socketio.on("call_join")
+@socketio.on(
+    "call_join"
+)
 def handle_call_join(data):
 
     room_code = data.get(
@@ -2589,24 +2700,27 @@ def handle_call_join(data):
     )
 
     # -----------------------------------------------------
-    # GET USERS WHO ARE ALREADY IN THE CALL
+    # GET EXISTING CALL PARTICIPANTS
     # -----------------------------------------------------
 
     existing_call_participants = []
 
-    for sid, _ in get_call_members(room_code):
+    for sid, _ in get_call_members(
+        room_code
+    ):
 
         if sid == request.sid:
             continue
 
         existing_call_participants.append(
             {
-                "socket_id": sid
+                "socket_id":
+                    sid
             }
         )
 
     # -----------------------------------------------------
-    # JOIN CALL ROOM FIRST
+    # JOIN CALL ROOM
     # -----------------------------------------------------
 
     join_room(
@@ -2614,11 +2728,7 @@ def handle_call_join(data):
     )
 
     # -----------------------------------------------------
-    # SEND EXISTING USERS TO THE NEW PARTICIPANT
-    #
-    # The NEW participant creates the offers.
-    # This gives every pair one clear offerer and avoids
-    # two browsers creating competing offers at the same time.
+    # SEND EXISTING USERS TO NEW PARTICIPANT
     # -----------------------------------------------------
 
     emit(
@@ -2630,7 +2740,7 @@ def handle_call_join(data):
     )
 
     # -----------------------------------------------------
-    # TELL EXISTING PARTICIPANTS ABOUT THE NEW USER
+    # NOTIFY EXISTING PARTICIPANTS
     # -----------------------------------------------------
 
     socketio.emit(
@@ -2650,14 +2760,18 @@ def handle_call_join(data):
     )
 
     # -----------------------------------------------------
-    # SEND UPDATED CALL COUNT
+    # UPDATE CALL COUNT
     # -----------------------------------------------------
 
     socketio.emit(
         "call_participant_count",
         {
             "count":
-                len(get_call_members(room_code))
+                len(
+                    get_call_members(
+                        room_code
+                    )
+                )
         },
         to=call_room
     )
@@ -2667,7 +2781,9 @@ def handle_call_join(data):
 # WEBRTC OFFER
 # =========================================================
 
-@socketio.on("webrtc_offer")
+@socketio.on(
+    "webrtc_offer"
+)
 def handle_webrtc_offer(data):
 
     target_socket_id = data.get(
@@ -2701,13 +2817,16 @@ def handle_webrtc_offer(data):
     ):
         return
 
-    if target_socket_id not in get_call_socket_ids(room_code):
+    if target_socket_id not in get_call_socket_ids(
+        room_code
+    ):
         return
 
     emit(
         "webrtc_offer",
         {
-            "offer": offer,
+            "offer":
+                offer,
 
             "sender_socket_id":
                 request.sid
@@ -2720,7 +2839,9 @@ def handle_webrtc_offer(data):
 # WEBRTC ANSWER
 # =========================================================
 
-@socketio.on("webrtc_answer")
+@socketio.on(
+    "webrtc_answer"
+)
 def handle_webrtc_answer(data):
 
     target_socket_id = data.get(
@@ -2754,13 +2875,16 @@ def handle_webrtc_answer(data):
     ):
         return
 
-    if target_socket_id not in get_call_socket_ids(room_code):
+    if target_socket_id not in get_call_socket_ids(
+        room_code
+    ):
         return
 
     emit(
         "webrtc_answer",
         {
-            "answer": answer,
+            "answer":
+                answer,
 
             "sender_socket_id":
                 request.sid
@@ -2773,7 +2897,9 @@ def handle_webrtc_answer(data):
 # WEBRTC ICE CANDIDATE
 # =========================================================
 
-@socketio.on("webrtc_ice_candidate")
+@socketio.on(
+    "webrtc_ice_candidate"
+)
 def handle_webrtc_ice_candidate(data):
 
     target_socket_id = data.get(
@@ -2807,13 +2933,16 @@ def handle_webrtc_ice_candidate(data):
     ):
         return
 
-    if target_socket_id not in get_call_socket_ids(room_code):
+    if target_socket_id not in get_call_socket_ids(
+        room_code
+    ):
         return
 
     emit(
         "webrtc_ice_candidate",
         {
-            "candidate": candidate,
+            "candidate":
+                candidate,
 
             "sender_socket_id":
                 request.sid
@@ -2826,7 +2955,9 @@ def handle_webrtc_ice_candidate(data):
 # CALL LEAVE
 # =========================================================
 
-@socketio.on("call_leave")
+@socketio.on(
+    "call_leave"
+)
 def handle_call_leave(data):
 
     room_code = data.get(
@@ -2851,7 +2982,10 @@ def handle_call_leave(data):
         room_code
     )
 
-    # Notify everyone else before removing the socket.
+    # -----------------------------------------------------
+    # NOTIFY OTHER PARTICIPANTS
+    # -----------------------------------------------------
+
     emit(
         "call_user_left",
         {
@@ -2865,12 +2999,18 @@ def handle_call_leave(data):
         include_self=False
     )
 
+    # -----------------------------------------------------
+    # LEAVE CALL ROOM
+    # -----------------------------------------------------
+
     leave_room(
         call_room
     )
 
     remaining_count = len(
-        get_call_members(room_code)
+        get_call_members(
+            room_code
+        )
     )
 
     socketio.emit(
@@ -2887,11 +3027,15 @@ def handle_call_leave(data):
 # SOCKET DISCONNECT
 # =========================================================
 
-@socketio.on("disconnect")
+@socketio.on(
+    "disconnect"
+)
 def handle_disconnect():
 
-    # If the browser closes/reloads while the user is in
-    # the call, remove that peer from every call room.
+    # -----------------------------------------------------
+    # REMOVE USER FROM CALL PEERS
+    # -----------------------------------------------------
+
     try:
 
         joined_rooms = list(
@@ -2907,9 +3051,12 @@ def handle_disconnect():
 
     for room_name in joined_rooms:
 
-        if not room_name.startswith("call_"):
+        if not room_name.startswith(
+            "call_"
+        ):
             continue
 
+        # Notify other call participants
         socketio.emit(
             "call_user_left",
             {
@@ -2920,11 +3067,14 @@ def handle_disconnect():
             include_self=False
         )
 
+        # Calculate remaining users
         try:
 
-            remaining_members = socketio.server.manager.get_participants(
-                "/",
-                room_name
+            remaining_members = (
+                socketio.server.manager.get_participants(
+                    "/",
+                    room_name
+                )
             )
 
             remaining_count = len(
@@ -2935,6 +3085,7 @@ def handle_disconnect():
 
             remaining_count = 0
 
+        # Update call count
         socketio.emit(
             "call_participant_count",
             {

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
 
     <style>
+
         /* =========================================
            ROOM
         ========================================= */
@@ -48,6 +49,15 @@
             display: grid;
             grid-template-columns: 1fr 320px;
             gap: 20px;
+        }
+
+
+        /* =========================================
+           VIDEO COLUMN
+        ========================================= */
+
+        .video-column {
+            min-width: 0;
         }
 
 
@@ -117,6 +127,163 @@
             font-size: 12px;
             z-index: 10;
             pointer-events: none;
+        }
+
+
+        /* =========================================
+           REACTION OVERLAY
+        ========================================= */
+
+        .reaction-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 25;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-reaction {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            font-size: 34px;
+            line-height: 1;
+            pointer-events: none;
+            user-select: none;
+
+            animation-name: reactionFloat;
+            animation-duration: 3.2s;
+            animation-timing-function: ease-out;
+            animation-fill-mode: forwards;
+
+            will-change: transform, opacity;
+        }
+
+        @keyframes reactionFloat {
+
+            0% {
+                opacity: 0;
+                transform:
+                    translate3d(
+                        var(--start-x),
+                        0,
+                        0
+                    )
+                    scale(0.7)
+                    rotate(0deg);
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            25% {
+                transform:
+                    translate3d(
+                        calc(var(--start-x) + var(--wave-1)),
+                        -22%,
+                        0
+                    )
+                    scale(1)
+                    rotate(var(--rotate-1));
+            }
+
+            50% {
+                transform:
+                    translate3d(
+                        calc(var(--start-x) + var(--wave-2)),
+                        -48%,
+                        0
+                    )
+                    scale(1.05)
+                    rotate(var(--rotate-2));
+            }
+
+            75% {
+                transform:
+                    translate3d(
+                        calc(var(--start-x) + var(--wave-3)),
+                        -73%,
+                        0
+                    )
+                    scale(1)
+                    rotate(var(--rotate-3));
+            }
+
+            90% {
+                opacity: 0.7;
+            }
+
+            100% {
+                opacity: 0;
+                transform:
+                    translate3d(
+                        calc(var(--start-x) + var(--wave-4)),
+                        -110%,
+                        0
+                    )
+                    scale(0.85)
+                    rotate(var(--rotate-4));
+            }
+        }
+
+
+        /* =========================================
+           REACTION SECTION
+        ========================================= */
+
+        .reaction-section {
+            margin-top: 12px;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+        .reaction-label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-right: 5px;
+        }
+
+        .reaction-btn {
+            width: 43px;
+            height: 40px;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            background: rgba(255, 255, 255, 0.04);
+            color: inherit;
+
+            font-size: 21px;
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            transition:
+                transform 0.15s ease,
+                background 0.15s ease,
+                border-color 0.15s ease;
+        }
+
+        .reaction-btn:hover {
+            transform: translateY(-3px) scale(1.08);
+            border-color: var(--cyan);
+            background: rgba(0, 255, 255, 0.08);
+        }
+
+        .reaction-btn:active {
+            transform: scale(0.9);
         }
 
 
@@ -608,7 +775,18 @@
                 align-items: flex-start;
             }
 
+            .reaction-section {
+                gap: 6px;
+            }
+
+            .reaction-btn {
+                width: 40px;
+                height: 38px;
+                font-size: 19px;
+            }
+
         }
+
     </style>
 
 </head>
@@ -716,93 +894,175 @@
 
 
             <!-- =================================
-                 VIDEO
+                 VIDEO COLUMN
             ================================= -->
 
-            <section class="video-section">
-
-                <div class="video-container">
+            <div class="video-column">
 
 
-                    <!-- UPLOADED VIDEO -->
+                <!-- =================================
+                     VIDEO
+                ================================= -->
 
-                    {% if room["video_type"] == "upload" %}
+                <section class="video-section">
 
-                    <video id="videoPlayer" controls playsinline preload="metadata">
-
-                        <source src="{{ url_for('temporary_video', room_code=room['room_code']) }}">
-
-                        Your browser does not support video playback.
-
-                    </video>
+                    <div class="video-container">
 
 
-                    <!-- YOUTUBE -->
+                        <!-- UPLOADED VIDEO -->
 
-                    {% elif room["video_type"] == "youtube" %}
+                        {% if room["video_type"] == "upload" %}
 
-                    <div id="youtubePlayer" data-video-id="{{ room['video_source'] }}">
-                    </div>
+                        <video id="videoPlayer" controls playsinline preload="metadata">
+
+                            <source src="{{ url_for('temporary_video', room_code=room['room_code']) }}">
+
+                            Your browser does not support video playback.
+
+                        </video>
 
 
-                    <!-- NO VIDEO -->
+                        <!-- YOUTUBE -->
 
-                    {% else %}
+                        {% elif room["video_type"] == "youtube" %}
 
-                    <div class="video-placeholder" id="videoPlaceholder">
+                        <div id="youtubePlayer" data-video-id="{{ room['video_source'] }}">
+                        </div>
 
-                        <div>
 
-                            <span>🎬</span>
+                        <!-- NO VIDEO -->
 
-                            <p>
-                                No video selected
-                            </p>
+                        {% else %}
+
+                        <div class="video-placeholder" id="videoPlaceholder">
+
+                            <div>
+
+                                <span>🎬</span>
+
+                                <p>
+                                    No video selected
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <!-- =================================
+                             REACTION ANIMATION OVERLAY
+                        ================================= -->
+
+                        <div
+                            id="reactionOverlay"
+                            class="reaction-overlay">
+                        </div>
+
+
+                        <!-- SYNC STATUS -->
+
+                        <div id="syncStatus" class="sync-status">
+
+                            Syncing...
+
+                        </div>
+
+
+                        <!-- ENABLE PLAYBACK -->
+
+                        <div id="enablePlayback" class="enable-playback">
+
+                            <button type="button" id="enablePlaybackButton">
+
+                                ▶ ENABLE PLAYBACK
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- VIDEO INFO -->
+
+                        <div class="video-info">
+
+                            <span id="currentVideoName">
+
+                                {{ room["video_name"] or "No video" }}
+
+                            </span>
 
                         </div>
 
                     </div>
 
-                    {% endif %}
+                </section>
 
 
-                    <!-- SYNC STATUS -->
+                <!-- =================================
+                     REACTIONS
+                ================================= -->
 
-                    <div id="syncStatus" class="sync-status">
+                <div class="reaction-section">
 
-                        Syncing...
+                    <span class="reaction-label">
+                        React
+                    </span>
 
-                    </div>
+                    <button
+                        type="button"
+                        class="reaction-btn"
+                        data-reaction="❤️">
+                        ❤️
+                    </button>
 
+                    <button
+                        type="button"
+                        class="reaction-btn"
+                        data-reaction="😂">
+                        😂
+                    </button>
 
-                    <!-- ENABLE PLAYBACK -->
+                    <button
+                        type="button"
+                        class="reaction-btn"
+                        data-reaction="😍">
+                        😍
+                    </button>
 
-                    <div id="enablePlayback" class="enable-playback">
+                    <button
+                        type="button"
+                        class="reaction-btn"
+                        data-reaction="👏">
+                        👏
+                    </button>
 
-                        <button type="button" id="enablePlaybackButton">
+                    <button
+                        type="button"
+                        class="reaction-btn"
+                        data-reaction="🔥">
+                        🔥
+                    </button>
 
-                            ▶ ENABLE PLAYBACK
+                    <button
+                        type="button"
+                        class="reaction-btn"
+                        data-reaction="😮">
+                        😮
+                    </button>
 
-                        </button>
-
-                    </div>
-
-
-                    <!-- VIDEO INFO -->
-
-                    <div class="video-info">
-
-                        <span id="currentVideoName">
-
-                            {{ room["video_name"] or "No video" }}
-
-                        </span>
-
-                    </div>
+                    <button
+                        type="button"
+                        class="reaction-btn"
+                        data-reaction="🎉">
+                        🎉
+                    </button>
 
                 </div>
 
-            </section>
+
+            </div>
 
 
             <!-- =================================
@@ -880,10 +1140,17 @@
 
                     <form class="chat-input-area" id="chatForm">
 
-                        <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..."
-                            maxlength="500" autocomplete="off">
+                        <input
+                            type="text"
+                            id="chatInput"
+                            class="chat-input"
+                            placeholder="Type a message..."
+                            maxlength="500"
+                            autocomplete="off">
 
-                        <button type="submit" class="chat-send">
+                        <button
+                            type="submit"
+                            class="chat-send">
 
                             SEND
 
@@ -921,7 +1188,10 @@
 
                     <!-- JOIN / LEAVE -->
 
-                    <button type="button" class="join-call-btn" id="joinCallButton">
+                    <button
+                        type="button"
+                        class="join-call-btn"
+                        id="joinCallButton">
 
                         📞 JOIN CALL
 
@@ -932,14 +1202,20 @@
 
                     <div class="call-controls" id="callControls">
 
-                        <button type="button" class="call-control-btn" id="muteButton">
+                        <button
+                            type="button"
+                            class="call-control-btn"
+                            id="muteButton">
 
                             🎙️ MUTE
 
                         </button>
 
 
-                        <button type="button" class="call-control-btn" id="cameraButton">
+                        <button
+                            type="button"
+                            class="call-control-btn"
+                            id="cameraButton">
 
                             📹 CAMERA OFF
 
@@ -970,20 +1246,30 @@
                     </h3>
 
 
-                    <button type="button" class="change-video-btn" id="changeVideoButton">
+                    <button
+                        type="button"
+                        class="change-video-btn"
+                        id="changeVideoButton">
 
                         🔄 CHANGE VIDEO
 
                     </button>
 
 
-                    <div class="change-video-panel" id="changeVideoPanel">
+                    <div
+                        class="change-video-panel"
+                        id="changeVideoPanel">
 
-                        <form method="POST" action="{{ url_for('change_video', room_code=room['room_code']) }}"
+                        <form
+                            method="POST"
+                            action="{{ url_for('change_video', room_code=room['room_code']) }}"
                             enctype="multipart/form-data">
 
 
-                            <input type="hidden" name="player_id" value="{{ player_id }}">
+                            <input
+                                type="hidden"
+                                name="player_id"
+                                value="{{ player_id }}">
 
 
                             <div class="video-option">
@@ -992,7 +1278,11 @@
                                     Upload a new video
                                 </label>
 
-                                <input type="file" name="video_file" accept="video/*" id="uploadInput">
+                                <input
+                                    type="file"
+                                    name="video_file"
+                                    accept="video/*"
+                                    id="uploadInput">
 
                             </div>
 
@@ -1015,23 +1305,35 @@
                                     YouTube URL
                                 </label>
 
-                                <input type="text" name="youtube_url" placeholder="https://youtube.com/watch?v=..."
+                                <input
+                                    type="text"
+                                    name="youtube_url"
+                                    placeholder="https://youtube.com/watch?v=..."
                                     id="youtubeInput">
 
                             </div>
 
 
-                            <input type="hidden" name="video_type" id="videoType" value="youtube">
+                            <input
+                                type="hidden"
+                                name="video_type"
+                                id="videoType"
+                                value="youtube">
 
 
-                            <button type="submit" class="change-submit">
+                            <button
+                                type="submit"
+                                class="change-submit">
 
                                 ▶ START NEW VIDEO
 
                             </button>
 
 
-                            <button type="button" class="cancel-change" id="cancelChange">
+                            <button
+                                type="button"
+                                class="cancel-change"
+                                id="cancelChange">
 
                                 Cancel
 
@@ -1148,6 +1450,311 @@
 
 
         /* =========================================
+           REACTION ELEMENTS
+        ========================================= */
+
+        const reactionOverlay =
+            document.getElementById(
+                "reactionOverlay"
+            );
+
+
+        const reactionButtons =
+            document.querySelectorAll(
+                ".reaction-btn"
+            );
+
+
+        /* =========================================
+           YOUTUBE ID
+        ========================================= */
+
+        if (youtubeContainer) {
+
+            youtubeVideoId =
+                youtubeContainer.dataset.videoId;
+
+        }
+
+
+        /* =========================================
+           REACTION SYSTEM
+        ========================================= */
+
+        /*
+         * Creates one floating reaction.
+         *
+         * The server broadcasts the reaction to every
+         * person in the room. Each browser then creates
+         * its own animation locally.
+         */
+
+        function createFloatingReaction(
+            reaction
+        ) {
+
+            if (!reactionOverlay) {
+                return;
+            }
+
+
+            const reactionElement =
+                document.createElement(
+                    "div"
+                );
+
+
+            reactionElement.className =
+                "floating-reaction";
+
+
+            reactionElement.textContent =
+                reaction;
+
+
+            /*
+             * Random starting position.
+             *
+             * Keep it around the bottom-middle area
+             * so reactions look like they are coming
+             * from the reaction area below the video.
+             */
+
+            const startX =
+                (Math.random() * 180) - 90;
+
+
+            /*
+             * Different wave values make every
+             * reaction follow a slightly different
+             * path.
+             */
+
+            const wave1 =
+                (Math.random() * 100) - 50;
+
+            const wave2 =
+                (Math.random() * 140) - 70;
+
+            const wave3 =
+                (Math.random() * 100) - 50;
+
+            const wave4 =
+                (Math.random() * 160) - 80;
+
+
+            const rotate1 =
+                (Math.random() * 30) - 15;
+
+            const rotate2 =
+                (Math.random() * 40) - 20;
+
+            const rotate3 =
+                (Math.random() * 50) - 25;
+
+            const rotate4 =
+                (Math.random() * 60) - 30;
+
+
+            reactionElement.style.setProperty(
+                "--start-x",
+                startX + "px"
+            );
+
+
+            reactionElement.style.setProperty(
+                "--wave-1",
+                wave1 + "px"
+            );
+
+
+            reactionElement.style.setProperty(
+                "--wave-2",
+                wave2 + "px"
+            );
+
+
+            reactionElement.style.setProperty(
+                "--wave-3",
+                wave3 + "px"
+            );
+
+
+            reactionElement.style.setProperty(
+                "--wave-4",
+                wave4 + "px"
+            );
+
+
+            reactionElement.style.setProperty(
+                "--rotate-1",
+                rotate1 + "deg"
+            );
+
+
+            reactionElement.style.setProperty(
+                "--rotate-2",
+                rotate2 + "deg"
+            );
+
+
+            reactionElement.style.setProperty(
+                "--rotate-3",
+                rotate3 + "deg"
+            );
+
+
+            reactionElement.style.setProperty(
+                "--rotate-4",
+                rotate4 + "deg"
+            );
+
+
+            /*
+             * Slightly randomize animation duration
+             * so simultaneous reactions don't all
+             * move identically.
+             */
+
+            const duration =
+                2.7 +
+                Math.random() * 1.2;
+
+
+            reactionElement.style.animationDuration =
+                duration + "s";
+
+
+            /*
+             * Random horizontal position around
+             * the center of the video.
+             */
+
+            reactionElement.style.left =
+                (50 + (Math.random() * 16 - 8)) +
+                "%";
+
+
+            reactionOverlay.appendChild(
+                reactionElement
+            );
+
+
+            /*
+             * Remove the element after animation.
+             */
+
+            setTimeout(
+                function () {
+
+                    reactionElement.remove();
+
+                },
+                (duration * 1000) + 200
+            );
+
+        }
+
+
+        /* =========================================
+           SEND REACTION
+        ========================================= */
+
+        reactionButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const reaction =
+                            button.dataset.reaction;
+
+
+                        if (!reaction) {
+                            return;
+                        }
+
+
+                        /*
+                         * Send reaction to Flask-SocketIO.
+                         */
+
+                        socket.emit(
+                            "send_reaction",
+                            {
+
+                                room_code:
+                                    roomCode,
+
+                                player_id:
+                                    playerId,
+
+                                reaction:
+                                    reaction
+
+                            }
+                        );
+
+
+                        /*
+                         * Small button feedback.
+                         */
+
+                        button.animate(
+                            [
+                                {
+                                    transform:
+                                        "scale(1)"
+                                },
+                                {
+                                    transform:
+                                        "scale(1.25)"
+                                },
+                                {
+                                    transform:
+                                        "scale(1)"
+                                }
+                            ],
+                            {
+                                duration: 180
+                            }
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           RECEIVE REACTION
+        ========================================= */
+
+        socket.on(
+            "reaction_received",
+            function (data) {
+
+                if (!data) {
+                    return;
+                }
+
+
+                if (!data.reaction) {
+                    return;
+                }
+
+
+                createFloatingReaction(
+                    data.reaction
+                );
+
+            }
+        );
+
+
+        /* =========================================
            CHAT ELEMENTS
         ========================================= */
 
@@ -1167,18 +1774,6 @@
             document.getElementById(
                 "chatMessages"
             );
-
-
-        /* =========================================
-           YOUTUBE ID
-        ========================================= */
-
-        if (youtubeContainer) {
-
-            youtubeVideoId =
-                youtubeContainer.dataset.videoId;
-
-        }
 
 
         /* =========================================
@@ -2888,8 +3483,10 @@
                     stream &&
                     existingVideo.srcObject !== stream
                 ) {
+
                     existingVideo.srcObject =
                         stream;
+
                 }
 
                 return existing;
@@ -2916,10 +3513,6 @@
 
             video.playsInline = true;
 
-            /* Only the local preview is muted.
-             * Remote videos MUST NOT be muted because
-             * their audio tracks carry the other users' voices.
-             */
             video.muted = !!isLocal;
 
             if (stream) {
@@ -2930,19 +3523,25 @@
             video.addEventListener(
                 "loadedmetadata",
                 function () {
+
                     const playPromise =
                         video.play();
 
                     if (playPromise) {
+
                         playPromise.catch(
                             function (error) {
+
                                 console.log(
                                     "Remote call media autoplay was blocked:",
                                     error
                                 );
+
                             }
                         );
+
                     }
+
                 }
             );
 
@@ -3019,12 +3618,15 @@
         ) {
 
             if (!pendingIceCandidates[remoteSocketId]) {
-                pendingIceCandidates[remoteSocketId] = [];
+
+                pendingIceCandidates[remoteSocketId] =
+                    [];
+
             }
 
-            pendingIceCandidates[remoteSocketId].push(
-                candidate
-            );
+            pendingIceCandidates[
+                remoteSocketId
+            ].push(candidate);
 
         }
 
@@ -3039,14 +3641,19 @@
         ) {
 
             const queued =
-                pendingIceCandidates[remoteSocketId] || [];
+                pendingIceCandidates[
+                    remoteSocketId
+                ] || [];
+
 
             for (const candidate of queued) {
 
                 try {
 
                     await peerConnection.addIceCandidate(
-                        new RTCIceCandidate(candidate)
+                        new RTCIceCandidate(
+                            candidate
+                        )
                     );
 
                 }
@@ -3060,6 +3667,7 @@
                 }
 
             }
+
 
             delete pendingIceCandidates[
                 remoteSocketId
@@ -3078,7 +3686,7 @@
 
             if (
                 peerConnections[
-                remoteSocketId
+                    remoteSocketId
                 ]
             ) {
 
@@ -3088,14 +3696,17 @@
 
             }
 
+
             const peerConnection =
                 new RTCPeerConnection(
                     rtcConfiguration
                 );
 
+
             peerConnections[
                 remoteSocketId
             ] = peerConnection;
+
 
             /* -----------------------------------------
                ADD LOCAL AUDIO + VIDEO TRACKS
@@ -3118,6 +3729,7 @@
 
             }
 
+
             /* -----------------------------------------
                RECEIVE REMOTE AUDIO + VIDEO
             ----------------------------------------- */
@@ -3129,10 +3741,7 @@
                         event.streams &&
                         event.streams[0];
 
-                    /* Some browsers can deliver a track
-                     * without a populated event.streams[0].
-                     * Build a stream in that case.
-                     */
+
                     if (!remoteStream) {
 
                         remoteStream =
@@ -3143,6 +3752,7 @@
                         );
 
                     }
+
 
                     createCallVideoTile(
                         remoteSocketId,
@@ -3155,6 +3765,7 @@
 
                 };
 
+
             /* -----------------------------------------
                ICE CANDIDATES
             ----------------------------------------- */
@@ -3166,9 +3777,11 @@
                         return;
                     }
 
+
                     socket.emit(
                         "webrtc_ice_candidate",
                         {
+
                             room_code:
                                 roomCode,
 
@@ -3180,10 +3793,12 @@
 
                             candidate:
                                 event.candidate
+
                         }
                     );
 
                 };
+
 
             /* -----------------------------------------
                CONNECTION STATE
@@ -3195,26 +3810,33 @@
                     const state =
                         peerConnection.connectionState;
 
+
                     console.log(
                         "WebRTC connection",
                         remoteSocketId,
                         state
                     );
 
+
                     if (state === "connected") {
 
                         setCallStatus(
                             "📞 Connected to " +
-                            Object.keys(peerConnections).length +
+                            Object.keys(
+                                peerConnections
+                            ).length +
                             " other participant" +
                             (
-                                Object.keys(peerConnections).length === 1
+                                Object.keys(
+                                    peerConnections
+                                ).length === 1
                                     ? ""
                                     : "s"
                             )
                         );
 
                     }
+
 
                     if (
                         state === "failed" ||
@@ -3229,6 +3851,7 @@
 
                 };
 
+
             return peerConnection;
 
         }
@@ -3242,9 +3865,15 @@
             remoteSocketId
         ) {
 
-            if (!inCall || remoteSocketId === socket.id) {
+            if (
+                !inCall ||
+                remoteSocketId === socket.id
+            ) {
+
                 return;
+
             }
+
 
             try {
 
@@ -3253,16 +3882,20 @@
                         remoteSocketId
                     );
 
+
                 const offer =
                     await peerConnection.createOffer();
+
 
                 await peerConnection.setLocalDescription(
                     offer
                 );
 
+
                 socket.emit(
                     "webrtc_offer",
                     {
+
                         room_code:
                             roomCode,
 
@@ -3274,6 +3907,7 @@
 
                         offer:
                             offer
+
                     }
                 );
 
@@ -3301,18 +3935,26 @@
                 const remoteSocketId =
                     data.sender_socket_id;
 
+
                 if (!remoteSocketId) {
                     return;
                 }
+
 
                 if (!inCall) {
                     return;
                 }
 
-                peerNames[remoteSocketId] =
+
+                peerNames[
+                    remoteSocketId
+                ] =
                     data.sender_name ||
-                    peerNames[remoteSocketId] ||
+                    peerNames[
+                        remoteSocketId
+                    ] ||
                     "Participant";
+
 
                 try {
 
@@ -3321,27 +3963,33 @@
                             remoteSocketId
                         );
 
+
                     await peerConnection.setRemoteDescription(
                         new RTCSessionDescription(
                             data.offer
                         )
                     );
 
+
                     await flushIceCandidates(
                         remoteSocketId,
                         peerConnection
                     );
 
+
                     const answer =
                         await peerConnection.createAnswer();
+
 
                     await peerConnection.setLocalDescription(
                         answer
                     );
 
+
                     socket.emit(
                         "webrtc_answer",
                         {
+
                             room_code:
                                 roomCode,
 
@@ -3353,6 +4001,7 @@
 
                             answer:
                                 answer
+
                         }
                     );
 
@@ -3381,26 +4030,31 @@
                 const remoteSocketId =
                     data.sender_socket_id;
 
+
                 if (!remoteSocketId) {
                     return;
                 }
+
 
                 try {
 
                     const peerConnection =
                         peerConnections[
-                        remoteSocketId
+                            remoteSocketId
                         ];
+
 
                     if (!peerConnection) {
                         return;
                     }
+
 
                     await peerConnection.setRemoteDescription(
                         new RTCSessionDescription(
                             data.answer
                         )
                     );
+
 
                     await flushIceCandidates(
                         remoteSocketId,
@@ -3432,17 +4086,26 @@
                 const remoteSocketId =
                     data.sender_socket_id;
 
+
                 const candidate =
                     data.candidate;
 
-                if (!remoteSocketId || !candidate) {
+
+                if (
+                    !remoteSocketId ||
+                    !candidate
+                ) {
+
                     return;
+
                 }
+
 
                 const peerConnection =
                     peerConnections[
-                    remoteSocketId
+                        remoteSocketId
                     ];
+
 
                 if (
                     !peerConnection ||
@@ -3458,10 +4121,13 @@
 
                 }
 
+
                 try {
 
                     await peerConnection.addIceCandidate(
-                        new RTCIceCandidate(candidate)
+                        new RTCIceCandidate(
+                            candidate
+                        )
                     );
 
                 }
@@ -3490,29 +4156,36 @@
                     return;
                 }
 
+
                 const participants =
                     data.participants || [];
 
-                for (const participant of participants) {
+
+                for (
+                    const participant
+                    of participants
+                ) {
 
                     const remoteSocketId =
                         participant.socket_id;
+
 
                     if (
                         !remoteSocketId ||
                         remoteSocketId === socket.id
                     ) {
+
                         continue;
+
                     }
 
-                    /* The new participant is the offerer
-                     * for every existing participant.
-                     */
+
                     await createOffer(
                         remoteSocketId
                     );
 
                 }
+
 
                 updateCallStatus();
 
@@ -3531,16 +4204,23 @@
                 const remoteSocketId =
                     data.socket_id;
 
+
                 if (
                     !remoteSocketId ||
                     remoteSocketId === socket.id
                 ) {
+
                     return;
+
                 }
 
-                peerNames[remoteSocketId] =
+
+                peerNames[
+                    remoteSocketId
+                ] =
                     data.player_name ||
                     "Participant";
+
 
                 if (inCall) {
 
@@ -3552,6 +4232,7 @@
                         ) +
                         " joined the call."
                     );
+
 
                     updateCallStatus();
 
@@ -3573,8 +4254,12 @@
                     return;
                 }
 
+
                 const count =
-                    Number(data.count || 0);
+                    Number(
+                        data.count || 0
+                    );
+
 
                 if (count <= 1) {
 
@@ -3583,6 +4268,7 @@
                     );
 
                 }
+
                 else {
 
                     setCallStatus(
@@ -3608,25 +4294,33 @@
                 const remoteSocketId =
                     data.socket_id;
 
+
                 if (!remoteSocketId) {
                     return;
                 }
 
+
                 const name =
-                    peerNames[remoteSocketId] ||
+                    peerNames[
+                        remoteSocketId
+                    ] ||
                     "A participant";
+
 
                 removePeerConnection(
                     remoteSocketId
                 );
 
+
                 delete peerNames[
                     remoteSocketId
                 ];
 
+
                 delete pendingIceCandidates[
                     remoteSocketId
                 ];
+
 
                 if (inCall) {
 
@@ -3635,6 +4329,7 @@
                         name +
                         " left the call."
                     );
+
 
                     updateCallStatus();
 
@@ -3660,10 +4355,12 @@
 
             }
 
+
             const count =
                 Object.keys(
                     peerConnections
                 ).length;
+
 
             if (count === 0) {
 
@@ -3672,6 +4369,7 @@
                 );
 
             }
+
             else {
 
                 setCallStatus(
@@ -3695,7 +4393,9 @@
                 return;
             }
 
+
             clearCallError();
+
 
             try {
 
@@ -3707,11 +4407,14 @@
                         }
                     );
 
+
                 inCall = true;
+
 
                 microphoneEnabled = true;
 
                 cameraEnabled = true;
+
 
                 createCallVideoTile(
                     "local",
@@ -3720,33 +4423,41 @@
                     true
                 );
 
+
                 callVideoGrid.classList.add(
                     "active"
                 );
+
 
                 callControls.classList.add(
                     "active"
                 );
 
+
                 joinCallButton.textContent =
                     "📞 LEAVE CALL";
+
 
                 joinCallButton.classList.add(
                     "leave"
                 );
 
+
                 setCallStatus(
                     "Joining call..."
                 );
 
+
                 socket.emit(
                     "call_join",
                     {
+
                         room_code:
                             roomCode,
 
                         player_id:
                             playerId
+
                     }
                 );
 
@@ -3758,9 +4469,11 @@
                     error
                 );
 
+
                 localStream = null;
 
                 inCall = false;
+
 
                 showCallError(
                     "Camera or microphone access was denied. Please allow permission in your browser and try again."
@@ -3781,16 +4494,20 @@
                 return;
             }
 
+
             socket.emit(
                 "call_leave",
                 {
+
                     room_code:
                         roomCode,
 
                     player_id:
                         playerId
+
                 }
             );
+
 
             Object.keys(
                 peerConnections
@@ -3799,16 +4516,19 @@
 
                     const peerConnection =
                         peerConnections[
-                        remoteSocketId
+                            remoteSocketId
                         ];
+
 
                     if (peerConnection) {
                         peerConnection.close();
                     }
 
+
                     delete peerConnections[
                         remoteSocketId
                     ];
+
 
                     removeCallVideoTile(
                         remoteSocketId
@@ -3816,6 +4536,7 @@
 
                 }
             );
+
 
             Object.keys(
                 pendingIceCandidates
@@ -3829,6 +4550,7 @@
                 }
             );
 
+
             Object.keys(
                 peerNames
             ).forEach(
@@ -3841,17 +4563,21 @@
                 }
             );
 
+
             if (localStream) {
 
                 localStream
                     .getTracks()
                     .forEach(
                         function (track) {
+
                             track.stop();
+
                         }
                     );
 
             }
+
 
             localStream = null;
 
@@ -3861,44 +4587,59 @@
 
             cameraEnabled = true;
 
+
             removeCallVideoTile(
                 "local"
             );
+
 
             callVideoGrid.classList.remove(
                 "active"
             );
 
+
             callControls.classList.remove(
                 "active"
             );
 
+
             joinCallButton.textContent =
                 "📞 JOIN CALL";
+
 
             joinCallButton.classList.remove(
                 "leave"
             );
 
+
             if (muteButton) {
+
                 muteButton.textContent =
                     "🎙️ MUTE";
+
                 muteButton.classList.remove(
                     "active-off"
                 );
+
             }
 
+
             if (cameraButton) {
+
                 cameraButton.textContent =
                     "📹 CAMERA OFF";
+
                 cameraButton.classList.remove(
                     "active-off"
                 );
+
             }
+
 
             setCallStatus(
                 "Not connected to call"
             );
+
 
             clearCallError();
 
@@ -3915,12 +4656,14 @@
 
             const peerConnection =
                 peerConnections[
-                remoteSocketId
+                    remoteSocketId
                 ];
+
 
             if (peerConnection) {
 
                 peerConnection.close();
+
 
                 delete peerConnections[
                     remoteSocketId
@@ -3928,9 +4671,11 @@
 
             }
 
+
             removeCallVideoTile(
                 remoteSocketId
             );
+
 
             updateCallStatus();
 
@@ -3948,10 +4693,15 @@
                 function () {
 
                     if (inCall) {
+
                         leaveCall();
+
                     }
+
                     else {
+
                         joinCall();
+
                     }
 
                 }
@@ -3974,37 +4724,47 @@
                         return;
                     }
 
+
                     const audioTracks =
                         localStream.getAudioTracks();
+
 
                     if (audioTracks.length === 0) {
                         return;
                     }
 
+
                     microphoneEnabled =
                         !microphoneEnabled;
 
+
                     audioTracks.forEach(
                         function (track) {
+
                             track.enabled =
                                 microphoneEnabled;
+
                         }
                     );
+
 
                     if (microphoneEnabled) {
 
                         muteButton.textContent =
                             "🎙️ MUTE";
 
+
                         muteButton.classList.remove(
                             "active-off"
                         );
 
                     }
+
                     else {
 
                         muteButton.textContent =
                             "🔇 UNMUTE";
+
 
                         muteButton.classList.add(
                             "active-off"
@@ -4032,37 +4792,47 @@
                         return;
                     }
 
+
                     const videoTracks =
                         localStream.getVideoTracks();
+
 
                     if (videoTracks.length === 0) {
                         return;
                     }
 
+
                     cameraEnabled =
                         !cameraEnabled;
 
+
                     videoTracks.forEach(
                         function (track) {
+
                             track.enabled =
                                 cameraEnabled;
+
                         }
                     );
+
 
                     if (cameraEnabled) {
 
                         cameraButton.textContent =
                             "📹 CAMERA OFF";
 
+
                         cameraButton.classList.remove(
                             "active-off"
                         );
 
                     }
+
                     else {
 
                         cameraButton.textContent =
                             "📹 CAMERA ON";
+
 
                         cameraButton.classList.add(
                             "active-off"
